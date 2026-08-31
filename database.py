@@ -23,6 +23,15 @@ def init_db():
         password TEXT NOT NULL
     )
     """)
+    # connection.commit()
+    # connection.close()
+    # connection.execute("""
+    #      ALTER TABLE candidates
+    #     ADD COLUMN photo TEXT
+    #  """)
+    # connection.execute("""
+    # drop table candidates
+    # """)
     connection.commit()
     connection.close()
 
