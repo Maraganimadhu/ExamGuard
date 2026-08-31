@@ -130,6 +130,46 @@
                     </div>
                 </div>
 
+                <!-- Candidate Photo / Identity Verification Field -->
+                <div class="form-group">
+                    <label for="candidatePhoto" class="form-label">Candidate Photo / Take Photo</label>
+                    <div class="photo-upload-card">
+                        <div class="photo-preview-wrapper" id="photoPreviewBox">
+                            <svg class="photo-placeholder-icon" id="photoPlaceholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <video id="cameraStream" autoplay playsinline style="display: none;"></video>
+                            <img id="photoPreviewImg" alt="Candidate Photo Preview" style="display: none;">
+                        </div>
+                        
+                        <div class="photo-actions">
+                            <button type="button" class="btn-photo-action" id="openCameraBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                <span id="cameraBtnText">Take Photo</span>
+                            </button>
+                            
+                            <label for="candidatePhoto" class="btn-photo-action" style="cursor: pointer;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span>Upload Photo</span>
+                            </label>
+                        </div>
+                        
+                        <input type="file" id="candidatePhoto" name="candidate_photo" accept="image/*" capture="user" style="display: none;">
+                        <input type="hidden" id="capturedPhotoData" name="captured_photo_data">
+                        <canvas id="photoCanvas" style="display: none;"></canvas>
+                        
+                        <p class="photo-status-text" id="photoStatus">Take a live photo or upload your identity photo for exam proctoring.</p>
+                    </div>
+                </div>
+
                 <!-- Terms & Proctoring Consent Checkbox -->
                 <div class="checkbox-group">
                     <label class="custom-checkbox">
@@ -227,6 +267,86 @@
                 strengthFill.style.backgroundColor = '#10b981';
                 strengthText.textContent = 'Strong password';
                 strengthText.style.color = '#10b981';
+            }
+        });
+
+        // Photo Capture & Upload Logic
+        const openCameraBtn = document.getElementById('openCameraBtn');
+        const cameraBtnText = document.getElementById('cameraBtnText');
+        const cameraStream = document.getElementById('cameraStream');
+        const photoPlaceholder = document.getElementById('photoPlaceholder');
+        const photoPreviewImg = document.getElementById('photoPreviewImg');
+        const candidatePhotoInput = document.getElementById('candidatePhoto');
+        const capturedPhotoData = document.getElementById('capturedPhotoData');
+        const photoCanvas = document.getElementById('photoCanvas');
+        const photoStatus = document.getElementById('photoStatus');
+        let currentStream = null;
+
+        openCameraBtn.addEventListener('click', async () => {
+            if (!currentStream) {
+                // Start camera stream
+                try {
+                    photoStatus.textContent = 'Requesting camera access...';
+                    photoStatus.style.color = '#38bdf8';
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }
+                    });
+                    currentStream = stream;
+                    cameraStream.srcObject = stream;
+                    cameraStream.style.display = 'block';
+                    photoPlaceholder.style.display = 'none';
+                    photoPreviewImg.style.display = 'none';
+                    cameraBtnText.textContent = 'Capture Snapshot';
+                    photoStatus.textContent = 'Camera active. Look straight into the camera and click Capture Snapshot.';
+                    photoStatus.style.color = '#38bdf8';
+                } catch (err) {
+                    console.error('Camera access error:', err);
+                    photoStatus.textContent = 'Camera access denied or not available. Please use "Upload Photo".';
+                    photoStatus.style.color = '#ef4444';
+                }
+            } else {
+                // Capture snapshot frame
+                photoCanvas.width = cameraStream.videoWidth || 320;
+                photoCanvas.height = cameraStream.videoHeight || 320;
+                const ctx = photoCanvas.getContext('2d');
+                ctx.drawImage(cameraStream, 0, 0, photoCanvas.width, photoCanvas.height);
+                
+                const dataUrl = photoCanvas.toDataURL('image/jpeg', 0.9);
+                capturedPhotoData.value = dataUrl;
+                photoPreviewImg.src = dataUrl;
+                photoPreviewImg.style.display = 'block';
+                cameraStream.style.display = 'none';
+
+                // Stop active stream tracks
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+
+                cameraBtnText.textContent = 'Retake Photo';
+                photoStatus.textContent = '✓ Photo captured successfully for identity verification.';
+                photoStatus.style.color = '#10b981';
+            }
+        });
+
+        // File upload handler
+        candidatePhotoInput.addEventListener('change', (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (file) {
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                    currentStream = null;
+                    cameraBtnText.textContent = 'Take Photo';
+                }
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    photoPreviewImg.src = event.target.result;
+                    photoPreviewImg.style.display = 'block';
+                    photoPlaceholder.style.display = 'none';
+                    cameraStream.style.display = 'none';
+                    capturedPhotoData.value = event.target.result;
+                    photoStatus.textContent = `✓ Photo selected: ${file.name}`;
+                    photoStatus.style.color = '#10b981';
+                };
+                reader.readAsDataURL(file);
             }
         });
     </script>

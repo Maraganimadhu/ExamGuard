@@ -51,7 +51,7 @@
                     <line x1="12" y1="8" x2="12" y2="12"></line>
                     <line x1="12" y1="16" x2="12.01" y2="16"></line>
                 </svg>
-                <span>Invalid username or password. Please verify and try again.</span>
+                <span>{{ error }}</span>
             </div>
             {% endif %}
 
@@ -68,19 +68,19 @@
 
             <!-- Login Form -->
             <form action="/login" method="POST" class="login-form" id="loginForm" novalidate>
-                <!-- Username Field -->
+                <!-- Email Field -->
                 <div class="form-group">
-                    <label for="username" class="form-label">Email</label>
+                    <label for="email" class="form-label">Email</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="12" cy="7" r="4"></circle>
+                                <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
                         </span>
-                        <input type="text" id="username" name="username" class="form-input"
-                            placeholder="Enter your username" required autocomplete="username">
+                        <input type="email" id="email" name="email" class="form-input"
+                            placeholder="Enter your registered email" required autocomplete="email">
                     </div>
                 </div>
 
