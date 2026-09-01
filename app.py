@@ -4,6 +4,10 @@ from flask import Flask, render_template, request  # This line imports the Flask
 from database import init_db ,get_db
 from werkzeug.security import generate_password_hash
 
+LOGIN='/login'
+DASHBOARD='/dashboard'
+REGISTER='/register'
+
 app =Flask(__name__)
 # it's create flask application instance and assign it to the variable app. The __name__ argument is used to determine the root path of the application, which is necessary for locating resources such as templates and static files.
 
@@ -33,9 +37,9 @@ def register():
         connection.close()
         print("registstion successful")
 
-        return render_template('register.html', success=True, username=username)
+        return render_template(REGISTER, success=True, username=username)
 
-    return render_template('register.html')
+    return render_template(REGISTER)
 
 
 
@@ -57,12 +61,12 @@ def login():
         if user and check_password_hash(user[3],password):
             # print("scussful to login")
             session['candidate_id']=user[0]
-            return render_template("dashboard.html",success=True,email=email)
+            return render_template(DASHBOARD,success=True,email=email)
         else:
             # print(" try again")
-            return render_template("login.html",success=False,error="Invalid")
+            return render_template(LOGIN,success=False,error="Invalid")
         
-    return render_template('login.html')
+    return render_template(LOGIN)
     
 @app.route("/dashboard")
 def dashboard():
