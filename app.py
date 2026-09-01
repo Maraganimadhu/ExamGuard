@@ -4,6 +4,17 @@ from flask import Flask, render_template, request  # This line imports the Flask
 from database import init_db ,get_db
 from werkzeug.security import generate_password_hash
 
+
+
+LOGIN_TEMPLATE = "login.html"
+DASHBOARD_TEMPLATE = "dashboard.html"
+REGISTER_TEMPLATE = "register.html"
+
+
+
+
+
+
 app = Flask(__name__)
 app.secret_key = 'examguard_secret_key_change_in_production'
 
@@ -31,9 +42,9 @@ def register():
         connection.close()
         print("Registration successful")
 
-        return render_template('register.html', success=True, username=username)
+        return render_template(REGISTER_TEMPLATE, success=True, username=username)
 
-    return render_template('register.html')
+    return render_template(REGISTER_TEMPLATE)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -58,24 +69,24 @@ def login():
             session['candidate_id'] = candidate[0]
             session['candidate_name'] = candidate[1]
             print("Login successful")
-            return render_template("dashboard.html", success=True, email=candidate[2], username=candidate[1])
+            return render_template(DASHBOARD_TEMPLATE, success=True, email=candidate[2], username=candidate[1])
         else:
             error_message = "Invalid username or password. Please verify and try again."
             print(error_message)
-            return render_template("login.html", success=False, error=error_message)
+            return render_template(LOGIN_TEMPLATE, success=False, error=error_message)
         
-    return render_template('login.html')
+    return render_template(LOGIN_TEMPLATE)
     
 @app.route("/dashboard")
 def dashboard():
     if 'candidate_id' not in session:
-        return render_template("login.html", error="Please log in first to access the dashboard.")
-    return render_template("dashboard.html")
+        return render_template(LOGIN_TEMPLATE, error="Please log in first to access the dashboard.")
+    return render_template(DASHBOARD_TEMPLATE)
 
 @app.route("/logout")
 def logout():
     session.clear()
-    return render_template("login.html")
+    return render_template(LOGIN_TEMPLATE)
 
 
 if __name__ == '__main__':
