@@ -3,16 +3,23 @@ from flask import session
 from flask import Flask, render_template, request  # This line imports the Flask class and the request object from the flask module. The Flask class is used to create a Flask application instance, while the request object is used to handle incoming HTTP requests.
 from database import init_db ,get_db
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+import os
+
+
+
 
 LOGIN='/login'
 DASHBOARD='/dashboard'
 REGISTER='/register'
 
 app =Flask(__name__)
+upload_folder="static/uploads"
 # it's create flask application instance and assign it to the variable app. The __name__ argument is used to determine the root path of the application, which is necessary for locating resources such as templates and static files.
 
 @app.route('/')   #   @ is decerator in python. It is used to modify the function below it. In this case, it is used to associate the home() function with the root URL of the application.
 def home():
+    
     return "WELCOME TO EXAM_GUARD!"  # This function returns the string "Hello, World!" when the root URL is accessed.
 
 
@@ -23,6 +30,15 @@ def register():
         username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
+        photo=request.files.get('candidate_photo')
+
+        if not photo or photo.filename == '':
+            return "please upload your photo"
+
+        os.makedirs(upload_folder, exist_ok=True)
+        filename=secure_filename(photo.filename)
+        photo_path=os.path.join(upload_folder,filename)
+        photo.save(photo_path)
         # print("name:", username)
         # print("email:", email)
         # print("password:", password)
@@ -30,8 +46,8 @@ def register():
         connection=get_db()
         connection.execute(
             """
-            INSERT INTO candidates(name,email,password)
-            values(?,?,?)""",(username,email,generate_password_hash(password))
+            INSERT INTO candidates(name,email,password,photo)
+            values(?,?,?,?)""",(username,email,generate_password_hash(password),photo_path)
             )
         connection.commit()
         connection.close()
