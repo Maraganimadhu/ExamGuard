@@ -20,7 +20,8 @@ def init_db():
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
         email TEXT NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        photo TEXT
     )
     """)
     # connection.commit()
@@ -29,13 +30,18 @@ def init_db():
     #      ALTER TABLE candidates
     #     ADD COLUMN photo TEXT
     #  """)
+
+
+
+
     # connection.execute("""
     # drop table candidates
     # """)
+    # connection.commit()
+    # connection.close()
+    # print("table dropped successfully")
+
+
     connection.commit()
     connection.close()
-
-
-# conn.commit()
-# conn.close()
-# print("data base created successfuly")
+    print("data base created successfuly")
