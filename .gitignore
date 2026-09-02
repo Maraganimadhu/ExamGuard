@@ -1,3 +1,35 @@
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+
+# Virtual Environments
 venv/
+**/venv/
+env/
+**/env/
+ENV/
+
+# Database files
+database/*.db
+database/*.sqlite3
+*.db
+*.sqlite3
+
+# Uploaded candidate images (keep directory structure)
+static/uploads/*
+!static/uploads/.gitkeep
+
+# Accidental nested repo clone
+ExamGuard/
+
+# Environment and secrets
+.env
+.env.*
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+

@@ -140,7 +140,7 @@
                                 <circle cx="12" cy="13" r="4"></circle>
                             </svg>
                             <video id="cameraStream" autoplay playsinline style="display: none;"></video>
-                            <img id="photoPreviewImg" alt="Candidate Photo Preview" style="display: none;">
+                            <img id="photoPreviewImg" alt="Candidate preview" style="display: none;">
                         </div>
                         
                         <div class="photo-actions">
@@ -191,19 +191,11 @@
                 </button>
             </form>
 
-            <!-- Security & Encryption Badge -->
-            <!-- <div class="security-badge">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span>256-Bit Encrypted & Anti-Cheat Verified</span>
-            </div> -->
-
             <!-- Footer Link -->
             <footer class="card-footer">
                 Already registered? <a href="/login">Sign In here</a>
             </footer>
+
         </div>
     </main>
 
@@ -249,7 +241,7 @@
             let score = 0;
             if (val.length >= 8) score++;
             if (/[A-Z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
+            if (/\d/.test(val)) score++;
             if (/[^A-Za-z0-9]/.test(val)) score++;
 
             if (score <= 1) {

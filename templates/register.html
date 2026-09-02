@@ -136,47 +136,50 @@
                     </div>
                 </div>
 
-                
-
-                <!-- Candidate Photo Upload Field
+                <!-- Candidate Identity Verification / Photo Upload -->
                 <div class="form-group">
-                    <label for="candidatePhoto" class="form-label">Candidate Photo</label>
+                    <label for="candidatePhoto" class="form-label">Candidate Identity Image</label>
                     <div class="photo-upload-card">
                         <div class="photo-preview-wrapper" id="photoPreviewBox">
                             <svg class="photo-placeholder-icon" id="photoPlaceholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
                                 <circle cx="12" cy="13" r="4"></circle>
                             </svg>
-                            <img id="photoPreviewImg" alt="Candidate Photo Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+                            <video id="cameraVideo" playsinline autoplay style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></video>
+                            <canvas id="captureCanvas" style="display: none;"></canvas>
+                            <img id="photoPreviewImg" alt="Candidate identity preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
                         </div>
-                        
+
                         <div class="photo-actions">
-                            <label for="candidatePhoto" class="btn-photo-action btn-upload-label" style="cursor: pointer;">
+                            <label for="candidatePhoto" class="btn-photo-action" style="cursor: pointer;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
                                     <line x1="12" y1="3" x2="12" y2="15"></line>
                                 </svg>
-                                <span>Select Photo</span>
+                                <span>Choose File</span>
                             </label>
+
+                            <button type="button" class="btn-photo-action" id="startCameraBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                <span id="cameraBtnText">Open Webcam</span>
+                            </button>
+
+                            <button type="button" class="btn-photo-action" id="captureBtn" style="display: none;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                <span>Capture</span>
+                            </button>
                         </div>
-                        
+
                         <input type="file" id="candidatePhoto" name="candidate_photo" accept="image/*" style="display: none;" required>
-                        <p class="photo-status-text" id="photoStatus">Upload your identity photo (JPG, PNG).</p>
+                        <p class="photo-status-text" id="photoStatus">Select a file or capture via webcam.</p>
                     </div>
-                </div> -->
-
-
-                <div>
-                    <label for="candidate_photo">candidate photo </label>
-                    <video id="camera" playsinline="true"></video>
-                    <button type="button" id="startCemara">start cemara</button>
-                    <button type="button" id="capturePhoto">capture photo</button>
-                    <canvas id="canvas"></canvas>
-                    <img alt="captur_photo" id="Preview">
-                    <p id="photostatus"></p>
-
-                    
                 </div>
 
                 <!-- Submit Button -->
@@ -203,19 +206,6 @@
         const strengthBar = document.getElementById('strengthBar');
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
-
-
-        const videoElement=document.getElementById("camera")
-        const canvas=document.getElementById("canvas")
-        const Preview=document.getElementById("Preview")
-        const startCemaraButton=document.getElementById("startCemara")
-        const captureButton=document.getElementById("capturePhoto")
-        const photostatus=document.getElementById("photostatus")
-        let cemaraStream=null
-        
-        
-
-        
 
         // Toggle password view
         toggleBtn.addEventListener('click', () => {
@@ -250,7 +240,7 @@
             let score = 0;
             if (val.length >= 8) score++;
             if (/[A-Z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
+            if (/\d/.test(val)) score++;
             if (/[^A-Za-z0-9]/.test(val)) score++;
 
             if (score <= 1) {
@@ -271,15 +261,34 @@
             }
         });
 
-        // Photo Upload & Preview Logic
+        // Photo Upload & Webcam Preview Logic
         const photoPlaceholder = document.getElementById('photoPlaceholder');
         const photoPreviewImg = document.getElementById('photoPreviewImg');
         const candidatePhotoInput = document.getElementById('candidatePhoto');
         const photoStatus = document.getElementById('photoStatus');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const captureCanvas = document.getElementById('captureCanvas');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const cameraBtnText = document.getElementById('cameraBtnText');
+        const captureBtn = document.getElementById('captureBtn');
 
+        let cameraStream = null;
+
+        function stopCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            cameraVideo.style.display = 'none';
+            captureBtn.style.display = 'none';
+            cameraBtnText.textContent = 'Open Webcam';
+        }
+
+        // File input selection
         candidatePhotoInput.addEventListener('change', (e) => {
             const file = e.target.files && e.target.files[0];
             if (file) {
+                stopCamera();
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     photoPreviewImg.src = event.target.result;
@@ -291,6 +300,59 @@
                 reader.readAsDataURL(file);
             }
         });
+
+        // Start / Stop Webcam
+        startCameraBtn.addEventListener('click', async () => {
+            if (cameraStream) {
+                stopCamera();
+                return;
+            }
+
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                cameraVideo.srcObject = cameraStream;
+                cameraVideo.style.display = 'block';
+                photoPlaceholder.style.display = 'none';
+                photoPreviewImg.style.display = 'none';
+                captureBtn.style.display = 'inline-flex';
+                cameraBtnText.textContent = 'Close Webcam';
+                photoStatus.textContent = 'Webcam active. Click "Capture" to take snapshot.';
+                photoStatus.style.color = '#38bdf8';
+            } catch (err) {
+                photoStatus.textContent = 'Error accessing webcam. Please select file manually.';
+                photoStatus.style.color = '#ef4444';
+            }
+        });
+
+        // Capture snapshot from webcam
+        captureBtn.addEventListener('click', () => {
+            if (!cameraStream) return;
+
+            const width = cameraVideo.videoWidth || 320;
+            const height = cameraVideo.videoHeight || 240;
+            captureCanvas.width = width;
+            captureCanvas.height = height;
+
+            const ctx = captureCanvas.getContext('2d');
+            ctx.drawImage(cameraVideo, 0, 0, width, height);
+
+            captureCanvas.toBlob((blob) => {
+                if (blob) {
+                    const capturedFile = new File([blob], `candidate_${Date.now()}.jpg`, { type: 'image/jpeg' });
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(capturedFile);
+                    candidatePhotoInput.files = dataTransfer.files;
+
+                    photoPreviewImg.src = captureCanvas.toDataURL('image/jpeg');
+                    photoPreviewImg.style.display = 'block';
+                    photoPlaceholder.style.display = 'none';
+                    photoStatus.textContent = '✓ Snapshot captured successfully!';
+                    photoStatus.style.color = '#10b981';
+
+                    stopCamera();
+                }
+            }, 'image/jpeg', 0.95);
+        });
     </script>
 </body>
-</html>
+</html>
