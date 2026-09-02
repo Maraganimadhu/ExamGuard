@@ -87,9 +87,9 @@ def register():
         connection.close()
         print("Registration successful for:", username)
 
-        return render_template('register.html', success=True, username=username)
+        return render_template(REGISTER, success=True, username=username)
 
-    return render_template('register.html')
+    return render_template(REGISTER)
 
 
 @app.route('/login', methods=['GET', 'POST'])
