@@ -1,17 +1,16 @@
 
+import os
 import sqlite3
 
+DB_DIR = "database"
+DB_PATH = os.path.join(DB_DIR, "examguard.db")
 
-DB="database/examguard.db"
 
 def get_db():
-    connection=sqlite3.connect(DB)
+    os.makedirs(DB_DIR, exist_ok=True)
+    connection = sqlite3.connect(DB_PATH)
     return connection
 
-# conn=sqlite3.connect(DB)
-# cursor=conn.cursor()
-
-# Create a table
 
 def init_db():
     connection = get_db()
@@ -26,7 +25,3 @@ def init_db():
     connection.commit()
     connection.close()
 
-
-# conn.commit()
-# conn.close()
-# print("data base created successfuly")

@@ -58,3 +58,4 @@ def capture_photo(image_data):
     return photo_path     #saved a photo in existing file
     
    
+
