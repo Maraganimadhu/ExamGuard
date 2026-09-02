@@ -3,15 +3,49 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from database import init_db, get_db
+from cemara import capture_photo
+
+LOGIN_TEMPLATE = "login.html"
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'examguard_super_secret_key_2026')
 upload_folder = "static/uploads"
 
 
+
+
+@app.route("/capture-photo", methods=["POST"])
+def captureCandidatePhoto():
+    photo=request.files.get("photo")
+    if not photo:
+        return {
+            "success":"False",
+            "message":"photo not recevied"
+            
+        },400
+    image_data=photo.read()
+    photo_path=capture_photo(image_data)
+    if not photo_path:
+        return {
+            "success":"False",
+            "message":"coud't process photo"
+        },400
+    session["capture_photo"]=photo_path
+    return {
+        "success":"True",
+        "message":"photo captured successfully",
+        "photo_path":photo_path
+    },200
+
+
+    
+    #return render_template("camera.html")
+
+
 @app.route('/')
 def home():
-    return render_template('login.html')
+    return render_template(LOGIN_TEMPLATE)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -65,7 +99,7 @@ def login():
         password = (request.form.get('password'))
 
         if not email or not password:
-            return render_template("login.html", error="Please enter both email and password.")
+            return render_template(LOGIN_TEMPLATE, error="Please enter both email and password.")
 
         connection = get_db()
         cursor = connection.cursor()
@@ -83,15 +117,15 @@ def login():
             session['candidate_id'] = candidate[0]
             return redirect(url_for('dashboard'))
         else:
-            return render_template("login.html", error="Invalid username or password. Please verify and try again.")
+            return render_template(LOGIN_TEMPLATE, error="Invalid username or password. Please verify and try again.")
 
-    return render_template('login.html')
+    return render_template(LOGIN_TEMPLATE)
 
 
 @app.route("/dashboard")
 def dashboard():
     if 'candidate_id' not in session:
-        return render_template("login.html", error="Please login first.")
+        return render_template(LOGIN_TEMPLATE, error="Please login first.")
        
     return render_template("dashboard.html", success=True, candidate_name=session.get('candidate_name'))
 

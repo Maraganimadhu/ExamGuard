@@ -136,7 +136,9 @@
                     </div>
                 </div>
 
-                <!-- Candidate Photo Upload Field -->
+                
+
+                <!-- Candidate Photo Upload Field
                 <div class="form-group">
                     <label for="candidatePhoto" class="form-label">Candidate Photo</label>
                     <div class="photo-upload-card">
@@ -162,6 +164,19 @@
                         <input type="file" id="candidatePhoto" name="candidate_photo" accept="image/*" style="display: none;" required>
                         <p class="photo-status-text" id="photoStatus">Upload your identity photo (JPG, PNG).</p>
                     </div>
+                </div> -->
+
+
+                <div>
+                    <label for="candidate_photo">candidate photo </label>
+                    <video id="camera" playsinline="true"></video>
+                    <button type="button" id="startCemara">start cemara</button>
+                    <button type="button" id="capturePhoto">capture photo</button>
+                    <canvas id="canvas"></canvas>
+                    <img alt="captur_photo" id="Preview">
+                    <p id="photostatus"></p>
+
+                    
                 </div>
 
                 <!-- Submit Button -->
@@ -188,6 +203,19 @@
         const strengthBar = document.getElementById('strengthBar');
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
+
+
+        const videoElement=document.getElementById("camera")
+        const canvas=document.getElementById("canvas")
+        const Preview=document.getElementById("Preview")
+        const startCemaraButton=document.getElementById("startCemara")
+        const captureButton=document.getElementById("capturePhoto")
+        const photostatus=document.getElementById("photostatus")
+        let cemaraStream=null
+        
+        
+
+        
 
         // Toggle password view
         toggleBtn.addEventListener('click', () => {
