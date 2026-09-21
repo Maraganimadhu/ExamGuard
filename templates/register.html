@@ -1,14 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="ExamGuard - Secure Online Examination Proctoring System Registration">
     <title>Register | ExamGuard Portal</title>
-    
+
     <!-- Link to CSS Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css') }}">
 </head>
+
 <body>
     <!-- Ambient Background Lighting -->
     <div class="background-blobs">
@@ -23,7 +25,8 @@
             <!-- Brand Header -->
             <header class="brand-header">
                 <div class="logo-badge">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <defs>
                             <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stop-color="#4f46e5" />
@@ -31,17 +34,18 @@
                                 <stop offset="100%" stop-color="#06b6d4" />
                             </linearGradient>
                         </defs>
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        <path d="m9 12 2 2 4-4"/>
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path d="m9 12 2 2 4-4" />
                     </svg>
                 </div>
-                <h1 class="brand-title">Exam<span>Guard</span></h1>
+                <h1 class="brand-title">Exam Guard </h1>
                 <p class="brand-subtitle">Candidate Identity & Exam Registration</p>
             </header>
 
             {% if success %}
             <div class="alert-banner alert-success" role="alert">
-                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <svg class="alert-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
                     <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                     <polyline points="22 4 12 14.01 9 11.01"></polyline>
                 </svg>
@@ -57,25 +61,20 @@
 
             <!-- Registration Form -->
             <form action="/register" method="POST" enctype="multipart/form-data" id="registerForm">
-                <!-- Username Field -->
+                <input type="hidden" name="photo_path" id="photo_path">
+                <!-- Name Field -->
                 <div class="form-group">
-                    <label for="username" class="form-label">Full Name / Username</label>
+                    <label for="name" class="form-label">Full Name / Username</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                         </span>
-                        <input 
-                            type="text" 
-                            id="username" 
-                            name="username" 
-                            class="form-input" 
-                            placeholder="e.g. alex_hunter" 
-                            required
-                            autocomplete="username"
-                        >
+                        <input type="text" id="name" name="username" class="form-input" placeholder="e.g. alex_hunter"
+                            required autocomplete="username">
                     </div>
                 </div>
 
@@ -84,20 +83,14 @@
                     <label for="email" class="form-label">Institutional / Official Email</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="20" height="16" x="2" y="4" rx="2"></rect>
                                 <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
                             </svg>
                         </span>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
-                            class="form-input" 
-                            placeholder="student@university.edu" 
-                            required 
-                            autocomplete="email"
-                        >
+                        <input type="email" id="email" name="email" class="form-input"
+                            placeholder="student@university.edu" required autocomplete="email">
                     </div>
                 </div>
 
@@ -106,22 +99,18 @@
                     <label for="password" class="form-label">Secure Password</label>
                     <div class="input-wrapper">
                         <span class="input-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect>
                                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                             </svg>
                         </span>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
-                            class="form-input" 
-                            placeholder="Min. 8 characters" 
-                            required 
-                            autocomplete="new-password"
-                        >
-                        <button type="button" class="toggle-password" id="togglePasswordBtn" title="Show/Hide Password" aria-label="Toggle password visibility">
-                            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <input type="password" id="password" name="password" class="form-input"
+                            placeholder="Min. 8 characters" required autocomplete="new-password">
+                        <button type="button" class="toggle-password" id="togglePasswordBtn" title="Show/Hide Password"
+                            aria-label="Toggle password visibility">
+                            <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
                                 <circle cx="12" cy="12" r="3"></circle>
                             </svg>
@@ -136,56 +125,63 @@
                     </div>
                 </div>
 
-                <!-- Candidate Identity Verification / Photo Upload -->
+                <!-- Candidate Camera Section (Centered Rectangular Frame) -->
                 <div class="form-group">
-                    <label for="candidatePhoto" class="form-label">Candidate Identity Image</label>
+                    <label class="form-label">Candidate Photo Verification</label>
                     <div class="photo-upload-card">
+
+                        <!-- Rectangular video & preview frame -->
                         <div class="photo-preview-wrapper" id="photoPreviewBox">
-                            <svg class="photo-placeholder-icon" id="photoPlaceholder" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                                <circle cx="12" cy="13" r="4"></circle>
-                            </svg>
-                            <video id="cameraVideo" playsinline autoplay style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;"></video>
-                            <canvas id="captureCanvas" style="display: none;"></canvas>
-                            <img id="photoPreviewImg" alt="Candidate identity preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                        </div>
-
-                        <div class="photo-actions">
-                            <label for="candidatePhoto" class="btn-photo-action" style="cursor: pointer;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                    <polyline points="17 8 12 3 7 8"></polyline>
-                                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                                </svg>
-                                <span>Choose File</span>
-                            </label>
-
-                            <button type="button" class="btn-photo-action" id="startCameraBtn">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                            <div class="camera-placeholder-state" id="photoPlaceholder">
+                                <svg class="photo-placeholder-icon" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+                                    stroke-linejoin="round">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                    </path>
                                     <circle cx="12" cy="13" r="4"></circle>
                                 </svg>
-                                <span id="cameraBtnText">Open Webcam</span>
+                                <span>Camera stream will show here</span>
+                            </div>
+                            <video id="camera" playsinline autoplay></video>
+                            <canvas id="canvas" style="display: none;"></canvas>
+                            <img id="preview" alt="Captured Photo">
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="photo-actions">
+                            <button type="button" class="btn-photo-action" id="startCamera">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z">
+                                    </path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                                <span>Start Camera</span>
                             </button>
 
-                            <button type="button" class="btn-photo-action" id="captureBtn" style="display: none;">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <button type="button" class="btn-photo-action" id="capturePhoto" disabled
+                                style="opacity: 0.5; cursor: not-allowed;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <span>Capture</span>
+                                <span>Capture Photo</span>
                             </button>
                         </div>
 
-                        <input type="file" id="candidatePhoto" name="candidate_photo" accept="image/*" style="display: none;" required>
-                        <p class="photo-status-text" id="photoStatus">Select a file or capture via webcam.</p>
+                        <p class="photo-status-text" id="photoStatus">Click "Start Camera" to begin verification.</p>
                     </div>
                 </div>
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn-submit" id="submitBtn">
+                <button type="submit" class="btn-submit" id="registerButton" disabled
+                    style="opacity: 0.5; cursor: not-allowed;">
                     <span>Complete Registration</span>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                        stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
                         <polyline points="12 5 19 12 12 19"></polyline>
                     </svg>
@@ -200,6 +196,7 @@
     </main>
 
     <script>
+        // Password toggle
         const passwordInput = document.getElementById('password');
         const toggleBtn = document.getElementById('togglePasswordBtn');
         const eyeIcon = document.getElementById('eyeIcon');
@@ -207,35 +204,22 @@
         const strengthFill = document.getElementById('strengthFill');
         const strengthText = document.getElementById('strengthText');
 
-        // Toggle password view
         toggleBtn.addEventListener('click', () => {
             const isPassword = passwordInput.type === 'password';
             passwordInput.type = isPassword ? 'text' : 'password';
-            
-            if (isPassword) {
-                eyeIcon.innerHTML = `
-                    <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
-                    <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
-                    <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
-                    <line x1="2" y1="2" x2="22" y2="22"></line>
-                `;
-            } else {
-                eyeIcon.innerHTML = `
-                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
-                    <circle cx="12" cy="12" r="3"></circle>
-                `;
-            }
+            eyeIcon.innerHTML = isPassword
+                ? `<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line>`
+                : `<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle>`;
         });
 
-        // Dynamic Password Strength Meter
+        // Password Strength
         passwordInput.addEventListener('input', () => {
             const val = passwordInput.value;
-            if (val.length === 0) {
+            if (!val.length) {
                 strengthBar.style.display = 'none';
                 strengthText.textContent = '';
                 return;
             }
-
             strengthBar.style.display = 'block';
             let score = 0;
             if (val.length >= 8) score++;
@@ -261,98 +245,93 @@
             }
         });
 
-        // Photo Upload & Webcam Preview Logic
-        const photoPlaceholder = document.getElementById('photoPlaceholder');
-        const photoPreviewImg = document.getElementById('photoPreviewImg');
-        const candidatePhotoInput = document.getElementById('candidatePhoto');
+        // Camera Logic
+        const startCameraButton = document.getElementById('startCamera');
+        const capturePhotoButton = document.getElementById('capturePhoto');
+        const registerButton = document.getElementById('registerButton');
+        const camera = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
         const photoStatus = document.getElementById('photoStatus');
-        const cameraVideo = document.getElementById('cameraVideo');
-        const captureCanvas = document.getElementById('captureCanvas');
-        const startCameraBtn = document.getElementById('startCameraBtn');
-        const cameraBtnText = document.getElementById('cameraBtnText');
-        const captureBtn = document.getElementById('captureBtn');
+        const preview = document.getElementById('preview');
+        const photoPlaceholder = document.getElementById('photoPlaceholder');
 
         let cameraStream = null;
 
-        function stopCamera() {
-            if (cameraStream) {
-                cameraStream.getTracks().forEach(track => track.stop());
-                cameraStream = null;
-            }
-            cameraVideo.style.display = 'none';
-            captureBtn.style.display = 'none';
-            cameraBtnText.textContent = 'Open Webcam';
-        }
-
-        // File input selection
-        candidatePhotoInput.addEventListener('change', (e) => {
-            const file = e.target.files && e.target.files[0];
-            if (file) {
-                stopCamera();
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    photoPreviewImg.src = event.target.result;
-                    photoPreviewImg.style.display = 'block';
-                    photoPlaceholder.style.display = 'none';
-                    photoStatus.textContent = `✓ Selected: ${file.name}`;
-                    photoStatus.style.color = '#10b981';
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Start / Stop Webcam
-        startCameraBtn.addEventListener('click', async () => {
-            if (cameraStream) {
-                stopCamera();
-                return;
-            }
-
+        startCameraButton.addEventListener('click', async function () {
             try {
-                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-                cameraVideo.srcObject = cameraStream;
-                cameraVideo.style.display = 'block';
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                camera.srcObject = cameraStream;
+                camera.style.display = 'block';
+                preview.style.display = 'none';
                 photoPlaceholder.style.display = 'none';
-                photoPreviewImg.style.display = 'none';
-                captureBtn.style.display = 'inline-flex';
-                cameraBtnText.textContent = 'Close Webcam';
-                photoStatus.textContent = 'Webcam active. Click "Capture" to take snapshot.';
+
+                capturePhotoButton.disabled = false;
+                capturePhotoButton.style.opacity = '1';
+                capturePhotoButton.style.cursor = 'pointer';
+
+                photoStatus.textContent = "Camera active. Look straight into the frame and click 'Capture Photo'.";
                 photoStatus.style.color = '#38bdf8';
-            } catch (err) {
-                photoStatus.textContent = 'Error accessing webcam. Please select file manually.';
+            } catch (error) {
+                console.error("Error accessing camera:", error);
+                photoStatus.textContent = "Error accessing camera. Please allow camera permissions.";
                 photoStatus.style.color = '#ef4444';
             }
         });
 
-        // Capture snapshot from webcam
-        captureBtn.addEventListener('click', () => {
+        capturePhotoButton.addEventListener('click', function () {
             if (!cameraStream) return;
 
-            const width = cameraVideo.videoWidth || 320;
-            const height = cameraVideo.videoHeight || 240;
-            captureCanvas.width = width;
-            captureCanvas.height = height;
+            canvas.width = camera.videoWidth || 640;
+            canvas.height = camera.videoHeight || 480;
+            const context = canvas.getContext('2d');
 
-            const ctx = captureCanvas.getContext('2d');
-            ctx.drawImage(cameraVideo, 0, 0, width, height);
+            context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg');
 
-            captureCanvas.toBlob((blob) => {
-                if (blob) {
-                    const capturedFile = new File([blob], `candidate_${Date.now()}.jpg`, { type: 'image/jpeg' });
-                    const dataTransfer = new DataTransfer();
-                    dataTransfer.items.add(capturedFile);
-                    candidatePhotoInput.files = dataTransfer.files;
+            preview.src = imageData;
+            preview.style.display = 'block';
+            camera.style.display = 'none';
 
-                    photoPreviewImg.src = captureCanvas.toDataURL('image/jpeg');
-                    photoPreviewImg.style.display = 'block';
-                    photoPlaceholder.style.display = 'none';
-                    photoStatus.textContent = '✓ Snapshot captured successfully!';
-                    photoStatus.style.color = '#10b981';
+            // Shut down webcam tracks
+            cameraStream.getTracks().forEach(track => track.stop());
+            cameraStream = null;
 
-                    stopCamera();
+            photoStatus.textContent = "Uploading captured photo...";
+            photoStatus.style.color = '#f59e0b';
+
+            canvas.toBlob(async function (blob) {
+                const formData = new FormData();
+                formData.append('photo', blob, 'photo.jpg');
+
+                try {
+                    const response = await fetch('/capture-photo', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const result = await response.json();
+
+                    if (result.success === 'True' || result.success === true) {
+                        if (result.photo_path) {
+                            document.getElementById('photo_path').value = result.photo_path;
+                        }
+                        photoStatus.textContent = "Photo uploaded successfully. Ready to submit.";
+                        photoStatus.style.color = '#10b981';
+
+                        registerButton.disabled = false;
+                        registerButton.style.opacity = '1';
+                        registerButton.style.cursor = 'pointer';
+                    } else {
+                        photoStatus.textContent = "Upload failed: " + (result.message || 'Unknown error');
+                        photoStatus.style.color = '#ef4444';
+                    }
+                } catch (error) {
+                    console.error("Error uploading photo:", error);
+                    photoStatus.textContent = "Network error while uploading photo.";
+                    photoStatus.style.color = '#ef4444';
                 }
-            }, 'image/jpeg', 0.95);
+            }, 'image/jpeg');
         });
     </script>
 </body>
-</html>
+
+</html>

@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="ExamGuard - High-Security AI Monitored Examination Platform">
+    <title>Examination Session | ExamGuard</title>
+
+    <!-- Link to Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/exam.css') }}">
+</head>
+
+<body>
+
+    <!-- Ambient Dynamic Backgrounds -->
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="cyber-grid"></div>
+
+    <!-- Top Executive Navigation Bar -->
+    <header class="header">
+        <div class="header-brand">
+            <div class="logo-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    <path d="m9 12 2 2 4-4"/>
+                </svg>
+            </div>
+            <h2>Exam<span>Guard</span></h2>
+            <span class="sub-text">| Live Assessment</span>
+        </div>
+
+        <div class="header-status-group">
+            <div class="badge-live-proctor">
+                <span class="pulse-dot"></span>
+                AI Proctor Active
+            </div>
+
+            <div class="candidate-pill">
+                <div class="candidate-avatar">
+                    {{ (candidate_name[0] if candidate_name else 'C') | upper }}
+                </div>
+                <span class="candidate-name">{{ candidate_name if candidate_name else 'Candidate' }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Examination Grid Layout -->
+    <main class="container">
+
+        <!-- Left Column: Proctoring & Telemetry -->
+        <aside class="telemetry-sidebar">
+
+            <!-- Webcam Feed Card -->
+            <div class="monitor-box">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                        </div>
+                        <h3>Proctoring Camera</h3>
+                    </div>
+                    <span class="card-badge">720p HD</span>
+                </div>
+
+                <!-- Video Viewfinder with HUD Overlays -->
+                <div class="camera-wrapper">
+                    <div class="camera-hud">
+                        <div class="hud-corner hud-top-left"></div>
+                        <div class="hud-corner hud-top-right"></div>
+                        <div class="hud-corner hud-bottom-left"></div>
+                        <div class="hud-corner hud-bottom-right"></div>
+                    </div>
+                    <div class="camera-live-tag">
+                        <span class="rec-dot"></span> LIVE
+                    </div>
+                    <div class="camera-scanline"></div>
+
+                    <!-- Video Element (Targeted by JS) -->
+                    <video id="camera" autoplay playsinline></video>
+
+                    <!-- Hidden Canvas Used For Captures -->
+                    <canvas id="canvas"></canvas>
+                </div>
+
+                <!-- Telemetry Metrics Grid -->
+                <div class="telemetry-grid">
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                            </svg>
+                            Camera Stream:
+                        </span>
+                        <span id="camera-status" class="status">Starting...</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="8" y1="12" x2="8" y2="12.01"></line>
+                                <line x1="16" y1="12" x2="16" y2="12.01"></line>
+                                <path d="M12 16c-1.5 0-2-.5-2-.5"></path>
+                            </svg>
+                            Biometric Face:
+                        </span>
+                        <span id="face-status" class="status">Waiting...</span>
+                    </div>
+
+                    <div class="telemetry-item">
+                        <span class="telemetry-label">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            Browser Shield:
+                        </span>
+                        <span id="browser-status" class="status">Active</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Activity Event Log Card -->
+            <div class="monitor-box">
+                <div class="card-header">
+                    <div class="card-title-group">
+                        <div class="card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                            </svg>
+                        </div>
+                        <h3>Security Activity</h3>
+                    </div>
+                    <span class="card-badge">Real-time</span>
+                </div>
+
+                <!-- Live Audit Stream -->
+                <div id="event-log">
+                    <div>System initialized. Monitoring started...</div>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Right Column: Examination Paper -->
+        <section class="exam-main">
+
+            <div class="question question-card">
+                <div class="question-meta-bar">
+                    <div class="question-tags">
+                        <span class="question-index-pill">Question 01 of 01</span>
+                        <span class="question-domain-pill">Python Core & Syntax</span>
+                    </div>
+                    <div class="question-points">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="8" r="7"></circle>
+                            <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                        </svg>
+                        1.0 Mark
+                    </div>
+                </div>
+
+                <h3 class="question-title">
+                    What is the output of the following Python code snippet?
+                </h3>
+
+                <!-- Syntax Highlighted Code Box -->
+                <div class="code-container">
+                    <div class="code-header">
+                        <div class="code-window-dots">
+                            <div class="dot dot-red"></div>
+                            <div class="dot dot-yellow"></div>
+                            <div class="dot dot-green"></div>
+                        </div>
+                        <span class="code-filename">solution.py</span>
+                        <span class="code-lang">Python 3</span>
+                    </div>
+                    <pre><code>x = 10
+print(x + 5)</code></pre>
+                </div>
+
+                <!-- Selectable Interactive Options -->
+                <div class="options-group">
+                    <label class="option">
+                        <input type="radio" name="answer" value="10">
+                        <span class="option-text">
+                            <span>10</span>
+                            <span class="option-key">A</span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="answer" value="15">
+                        <span class="option-text">
+                            <span>15</span>
+                            <span class="option-key">B</span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="answer" value="20">
+                        <span class="option-text">
+                            <span>20</span>
+                            <span class="option-key">C</span>
+                        </span>
+                    </label>
+
+                    <label class="option">
+                        <input type="radio" name="answer" value="25">
+                        <span class="option-text">
+                            <span>25</span>
+                            <span class="option-key">D</span>
+                        </span>
+                    </label>
+                </div>
+
+                <!-- Action Controls -->
+                <div class="action-footer">
+                    <button type="button" onclick="submitAnswer()">
+                        <span>Save Answer</span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"></path>
+                            <path d="m12 5 7 7-7 7"></path>
+                        </svg>
+                    </button>
+
+                    <div class="security-note">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Continuous proctoring & event telemetry active
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Toast Notification Element -->
+    <div id="exam-toast" class="exam-toast">
+        <div class="exam-toast-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+        </div>
+        <span id="toast-text">Answer saved successfully</span>
+    </div>
+
+
+
+<script>
+
+
+/* =====================================================
+   PART 1
+   CAMERA VARIABLES
+===================================================== */
+
+const video =
+    document.getElementById("camera");
+
+
+const canvas =
+    document.getElementById("canvas");
+
+
+const context =
+    canvas.getContext("2d");
+
+
+const cameraStatus =
+    document.getElementById("camera-status");
+
+
+const faceStatus =
+    document.getElementById("face-status");
+
+
+
+/* =====================================================
+   PART 2
+   START CAMERA
+===================================================== */
+
+navigator.mediaDevices
+    .getUserMedia({
+
+        video: true,
+
+        audio: false
+
+    })
+
+
+    .then(function(stream) {
+
+        /*
+        Connect webcam stream
+        to video element
+        */
+
+        video.srcObject = stream;
+
+
+        cameraStatus.innerText =
+            "Connected";
+
+
+        cameraStatus.style.color =
+            "green";
+
+
+        /*
+        Start sending frames
+        */
+
+        startFaceMonitoring();
+
+    })
+
+
+    .catch(function(error) {
+
+        console.error(
+            "Camera error:",
+            error
+        );
+
+
+        cameraStatus.innerText =
+            "Camera access denied";
+
+
+        cameraStatus.style.color =
+            "red";
+
+    });
+
+
+
+/* =====================================================
+   PART 3
+   START FACE MONITORING
+===================================================== */
+
+function startFaceMonitoring() {
+
+    /*
+    Capture one frame
+    every 2 seconds
+    */
+
+    setInterval(
+
+        captureAndSendFrame,
+
+        2000
+
+    );
+
+}
+
+
+
+/* =====================================================
+   PART 4
+   CAPTURE WEBCAM FRAME
+===================================================== */
+
+function captureAndSendFrame() {
+
+    /*
+    Make canvas same size
+    as video
+    */
+
+    canvas.width =
+        video.videoWidth;
+
+
+    canvas.height =
+        video.videoHeight;
+
+
+    /*
+    Draw current webcam frame
+    onto canvas
+    */
+
+    context.drawImage(
+
+        video,
+
+        0,
+
+        0,
+
+        canvas.width,
+
+        canvas.height
+
+    );
+
+
+    /*
+    Convert canvas image
+    into JPEG
+    */
+
+    canvas.toBlob(
+
+        function(blob) {
+
+
+            if (!blob) {
+
+                console.error(
+                    "Could not create image"
+                );
+
+                return;
+
+            }
+
+
+            /*
+            Create FormData
+            */
+
+            const formData =
+                new FormData();
+
+
+            formData.append(
+
+                "image",
+
+                blob,
+
+                "frame.jpg"
+
+            );
+
+
+            /*
+            Send frame to Flask
+            */
+
+            fetch(
+
+                "/monitor-face",
+
+                {
+
+                    method: "POST",
+
+                    body: formData
+
+                }
+
+            )
+
+
+            .then(function(response) {
+
+                return response.json();
+
+            })
+
+
+            .then(function(data) {
+
+
+                console.log(
+                    "Face state:",
+                    data.state
+                );
+
+
+                /*
+                Update face status
+                */
+
+                if (
+                    data.state ===
+                    "face_detected"
+                ) {
+
+                    faceStatus.innerText =
+                        "Face Detected";
+
+
+                    faceStatus.style.color =
+                        "green";
+
+                }
+
+                else if (
+                    data.state ===
+                    "face_absent"
+                ) {
+
+                    faceStatus.innerText =
+                        "Face Absent";
+
+
+                    faceStatus.style.color =
+                        "red";
+
+                }
+
+            })
+
+
+            .catch(function(error) {
+
+                console.error(
+                    "Face monitoring error:",
+                    error
+                );
+
+            });
+
+
+        },
+
+        "image/jpeg",
+
+        0.7
+
+    );
+
+}
+
+
+
+/* =====================================================
+   PART 5
+   BROWSER EVENT FUNCTION
+===================================================== */
+
+function logBrowserEvent(
+    eventType,
+    details
+) {
+
+
+    /*
+    Send browser event
+    to Flask
+    */
+
+    fetch(
+
+        "/log-browser-event",
+
+        {
+
+            method: "POST",
+
+
+            headers: {
+
+                "Content-Type":
+                    "application/json"
+
+            },
+
+
+            body: JSON.stringify({
+
+                event_type:
+                    eventType,
+
+                details:
+                    details
+
+            })
+
+        }
+
+    )
+
+
+    .then(function(response) {
+
+        return response.json();
+
+    })
+
+
+    .then(function(data) {
+
+        console.log(
+
+            "Browser event saved:",
+
+            eventType
+
+        );
+
+    })
+
+
+    .catch(function(error) {
+
+        console.error(
+
+            "Browser event error:",
+
+            error
+
+        );
+
+    });
+
+
+    /*
+    Also show event
+    on screen
+    */
+
+    displayEvent(
+
+        eventType,
+
+        details
+
+    );
+
+}
+
+
+
+/* =====================================================
+   PART 6
+   DISPLAY BROWSER EVENT
+===================================================== */
+
+function displayEvent(
+    eventType,
+    details
+) {
+
+
+    const eventLog =
+        document.getElementById(
+            "event-log"
+        );
+
+
+    const time =
+        new Date()
+        .toLocaleTimeString();
+
+
+    const message =
+        document.createElement("div");
+
+
+    message.innerText =
+
+        time +
+        " - " +
+        eventType +
+        " - " +
+        details;
+
+
+    eventLog.appendChild(
+        message
+    );
+
+
+    /*
+    Scroll to latest event
+    */
+
+    eventLog.scrollTop =
+        eventLog.scrollHeight;
+
+}
+
+
+
+/* =====================================================
+   PART 7
+   EXAM STARTED
+===================================================== */
+
+window.addEventListener(
+
+    "load",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "exam_started",
+
+            "Candidate opened examination page"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 8
+   TAB SWITCH
+===================================================== */
+
+document.addEventListener(
+
+    "visibilitychange",
+
+    function() {
+
+
+        if (
+            document.hidden
+        ) {
+
+
+            logBrowserEvent(
+
+                "tab_switch",
+
+                "Candidate left examination page"
+
+            );
+
+        }
+
+        else {
+
+
+            logBrowserEvent(
+
+                "tab_return",
+
+                "Candidate returned to examination page"
+
+            );
+
+        }
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 9
+   WINDOW FOCUS LOST
+===================================================== */
+
+window.addEventListener(
+
+    "blur",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "focus_lost",
+
+            "Browser window lost focus"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 10
+   WINDOW FOCUS GAINED
+===================================================== */
+
+window.addEventListener(
+
+    "focus",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "focus_gained",
+
+            "Browser window regained focus"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 11
+   COPY
+===================================================== */
+
+document.addEventListener(
+
+    "copy",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "copy_attempt",
+
+            "Candidate attempted to copy content"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 12
+   PASTE
+===================================================== */
+
+document.addEventListener(
+
+    "paste",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "paste_attempt",
+
+            "Candidate attempted to paste content"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 13
+   CUT
+===================================================== */
+
+document.addEventListener(
+
+    "cut",
+
+    function() {
+
+
+        logBrowserEvent(
+
+            "cut_attempt",
+
+            "Candidate attempted to cut content"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 14
+   RIGHT CLICK
+===================================================== */
+
+document.addEventListener(
+
+    "contextmenu",
+
+    function(event) {
+
+
+        /*
+        Stop normal context menu
+        */
+
+        event.preventDefault();
+
+
+        logBrowserEvent(
+
+            "right_click",
+
+            "Candidate attempted right click"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 15
+   KEYBOARD ACTIVITY
+===================================================== */
+
+document.addEventListener(
+
+    "keydown",
+
+    function(event) {
+
+
+        /*
+        We record only that
+        keyboard activity happened.
+
+        We do NOT store
+        the actual key.
+        */
+
+        logBrowserEvent(
+
+            "keyboard_activity",
+
+            "Candidate pressed a keyboard key"
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 16
+   MOUSE ACTIVITY
+===================================================== */
+
+let lastMouseEventTime = 0;
+
+
+document.addEventListener(
+
+    "mousemove",
+
+    function() {
+
+
+        const currentTime =
+            Date.now();
+
+
+        /*
+        Save mouse activity
+        only once every 5 seconds.
+        */
+
+        if (
+
+            currentTime -
+            lastMouseEventTime
+            >= 5000
+
+        ) {
+
+
+            lastMouseEventTime =
+                currentTime;
+
+
+            logBrowserEvent(
+
+                "mouse_activity",
+
+                "Candidate moved mouse"
+
+            );
+
+        }
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 17
+   ANSWER SELECTED
+===================================================== */
+
+const answerOptions =
+
+    document.querySelectorAll(
+
+        'input[name="answer"]'
+
+    );
+
+
+answerOptions.forEach(
+
+    function(option) {
+
+
+        option.addEventListener(
+
+            "change",
+
+            function() {
+
+
+                logBrowserEvent(
+
+                    "answer_selected",
+
+                    "Candidate selected an answer"
+
+                );
+
+            }
+
+        );
+
+    }
+
+);
+
+
+
+/* =====================================================
+   PART 18
+   SAVE ANSWER
+===================================================== */
+
+function showToast(msg) {
+    const toast = document.getElementById("exam-toast");
+    const toastText = document.getElementById("toast-text");
+    if (toast) {
+        if (toastText) toastText.innerText = msg;
+        toast.classList.add("show");
+        setTimeout(function() {
+            toast.classList.remove("show");
+        }, 3200);
+    }
+}
+
+function submitAnswer() {
+
+
+    logBrowserEvent(
+
+        "answer_saved",
+
+        "Candidate saved answer"
+
+    );
+
+    showToast("Answer saved successfully");
+
+    alert(
+        "Answer saved successfully"
+    );
+
+}
+
+
+</script>
+
+
+</body>
+
+</html>

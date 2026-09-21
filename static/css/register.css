@@ -12,34 +12,34 @@
     --bg-surface-hover: rgba(28, 36, 56, 0.95);
     --bg-input: rgba(13, 19, 33, 0.7);
     --bg-input-focus: rgba(17, 24, 39, 0.95);
-    
+
     /* Primary & Accents */
     --primary: #4f46e5;
     --primary-glow: rgba(79, 70, 229, 0.4);
     --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #3b82f6 50%, #06b6d4 100%);
     --accent-cyan: #06b6d4;
     --accent-cyan-glow: rgba(6, 182, 212, 0.3);
-    
+
     /* Text Colors */
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
-    
+
     /* Status Colors */
     --success: #10b981;
     --success-bg: rgba(16, 185, 129, 0.15);
     --warning: #f59e0b;
     --danger: #ef4444;
-    
+
     /* Borders & Outlines */
     --border-subtle: rgba(255, 255, 255, 0.08);
     --border-highlight: rgba(99, 102, 241, 0.4);
     --border-focus: #6366f1;
-    
+
     /* Shadows */
     --shadow-card: 0 25px 50px -12px rgba(0, 0, 0, 0.6), 0 0 40px rgba(79, 70, 229, 0.15);
     --shadow-btn: 0 10px 25px -5px rgba(79, 70, 229, 0.5), 0 8px 10px -6px rgba(79, 70, 229, 0.5);
-    
+
     /* Sizing & Transitions */
     --radius-lg: 20px;
     --radius-md: 12px;
@@ -121,9 +121,11 @@ body {
     0% {
         transform: translate(0, 0) scale(1);
     }
+
     50% {
         transform: translate(30px, 40px) scale(1.08);
     }
+
     100% {
         transform: translate(-30px, -20px) scale(0.95);
     }
@@ -136,7 +138,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
+    background-image:
         linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 40px 40px;
@@ -161,6 +163,7 @@ body {
         opacity: 0;
         transform: translateY(20px) scale(0.97);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -231,7 +234,7 @@ body {
 
 .brand-title span {
     background: var(--primary-gradient);
-    -webkit-background-clip: text;
+    /* -webkit-background-clip: text; */
     -webkit-text-fill-color: transparent;
 }
 
@@ -270,6 +273,7 @@ body {
         opacity: 0;
         transform: translateY(-10px);
     }
+
     to {
         opacity: 1;
         transform: translateY(0);
@@ -411,20 +415,63 @@ body {
     box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
 }
 
+/* Candidate Photo & Live Capture Section */
+.photo-upload-card {
+    background: var(--bg-input);
+    border: 1px dashed var(--border-highlight);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    text-align: center;
+    transition: all var(--transition-smooth);
+    position: relative;
+    overflow: hidden;
+}
+
+.photo-upload-card:hover {
+    border-color: var(--accent-cyan);
+    background: rgba(17, 24, 39, 0.85);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+}
+
+/* RECTANGULAR FRAME CENTERED */
 .photo-preview-wrapper {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin: 0 auto 0.9rem;
-    background: rgba(255, 255, 255, 0.03);
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-md);
+    margin: 0 auto 1.25rem auto;
+    background: #080c14;
     border: 2px solid var(--border-highlight);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 0 15px rgba(79, 70, 229, 0.25);
-    transition: border-color var(--transition-fast);
+    box-shadow: 0 0 20px rgba(79, 70, 229, 0.2);
+}
+
+.photo-preview-wrapper video,
+.photo-preview-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: none;
+}
+
+.camera-placeholder-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.photo-placeholder-icon {
+    width: 32px;
+    height: 32px;
+    color: var(--accent-cyan);
+    opacity: 0.7;
 }
 
 .photo-upload-card:hover .photo-preview-wrapper {
@@ -527,11 +574,11 @@ body {
     cursor: pointer;
 }
 
-.custom-checkbox:hover input ~ .checkmark {
+.custom-checkbox:hover input~.checkmark {
     border-color: var(--accent-cyan);
 }
 
-.custom-checkbox input:checked ~ .checkmark {
+.custom-checkbox input:checked~.checkmark {
     background: var(--primary-gradient);
     border-color: transparent;
 }
@@ -549,7 +596,7 @@ body {
     transform: rotate(45deg);
 }
 
-.custom-checkbox input:checked ~ .checkmark::after {
+.custom-checkbox input:checked~.checkmark::after {
     display: block;
 }
 
@@ -673,12 +720,12 @@ body {
     body {
         padding: 1rem 0.75rem;
     }
-    
+
     .register-card {
         padding: 2rem 1.25rem;
         border-radius: var(--radius-md);
     }
-    
+
     .brand-title {
         font-size: 1.5rem;
     }
