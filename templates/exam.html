@@ -154,13 +154,33 @@
         <!-- Right Column: Examination Paper -->
         <section class="exam-main">
 
-            <div class="question question-card">
+            <!-- Question Palette Header -->
+            <div class="question-palette-card">
+                <div class="palette-header">
+                    <div class="palette-title">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Question Palette</span>
+                    </div>
+                    <span id="palette-counter" class="palette-counter">Answered: 0 / 10</span>
+                </div>
+                <div id="palette-grid" class="palette-grid">
+                    <!-- Populated dynamically via JS: 10 question buttons -->
+                </div>
+            </div>
+
+            <!-- Dynamic Question Card -->
+            <div class="question question-card" id="question-card">
                 <div class="question-meta-bar">
                     <div class="question-tags">
-                        <span class="question-index-pill">Question 01 of 01</span>
-                        <span class="question-domain-pill">Python Core & Syntax</span>
+                        <span class="question-index-pill" id="question-index-pill">Question 01 of 10</span>
+                        <span class="question-domain-pill" id="question-domain-pill">Python Core & Syntax</span>
                     </div>
-                    <div class="question-points">
+                    <div class="question-points" id="question-points">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="8" r="7"></circle>
                             <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
@@ -169,83 +189,99 @@
                     </div>
                 </div>
 
-                <h3 class="question-title">
-                    What is the output of the following Python code snippet?
+                <h3 class="question-title" id="question-title">
+                    Loading question...
                 </h3>
 
                 <!-- Syntax Highlighted Code Box -->
-                <div class="code-container">
+                <div class="code-container" id="code-container">
                     <div class="code-header">
                         <div class="code-window-dots">
                             <div class="dot dot-red"></div>
                             <div class="dot dot-yellow"></div>
                             <div class="dot dot-green"></div>
                         </div>
-                        <span class="code-filename">solution.py</span>
+                        <span class="code-filename">snippet.py</span>
                         <span class="code-lang">Python 3</span>
                     </div>
-                    <pre><code>x = 10
-print(x + 5)</code></pre>
+                    <pre><code id="question-code"></code></pre>
                 </div>
 
                 <!-- Selectable Interactive Options -->
-                <div class="options-group">
-                    <label class="option">
-                        <input type="radio" name="answer" value="10">
-                        <span class="option-text">
-                            <span>10</span>
-                            <span class="option-key">A</span>
-                        </span>
-                    </label>
-
-                    <label class="option">
-                        <input type="radio" name="answer" value="15">
-                        <span class="option-text">
-                            <span>15</span>
-                            <span class="option-key">B</span>
-                        </span>
-                    </label>
-
-                    <label class="option">
-                        <input type="radio" name="answer" value="20">
-                        <span class="option-text">
-                            <span>20</span>
-                            <span class="option-key">C</span>
-                        </span>
-                    </label>
-
-                    <label class="option">
-                        <input type="radio" name="answer" value="25">
-                        <span class="option-text">
-                            <span>25</span>
-                            <span class="option-key">D</span>
-                        </span>
-                    </label>
+                <div class="options-group" id="options-group">
+                    <!-- Populated dynamically via JS -->
                 </div>
 
                 <!-- Action Controls -->
                 <div class="action-footer">
-                    <button type="button" onclick="submitAnswer()">
-                        <span>Save Answer</span>
+                    <div class="nav-buttons-group">
+                        <button type="button" class="btn-secondary" id="btn-prev" onclick="prevQuestion()" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m15 18-6-6 6-6"/>
+                            </svg>
+                            <span>Previous</span>
+                        </button>
+
+                        <button type="button" class="btn-secondary" id="btn-next" onclick="nextQuestion()">
+                            <span>Next</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m9 18 6-6-6-6"/>
+                            </svg>
+                        </button>
+
+                        <button type="button" onclick="saveCurrentAnswer(true)">
+                            <span>Save Answer</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button type="button" class="btn-submit" id="btn-finish" onclick="submitExam()">
+                        <span>Submit Exam</span>
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M5 12h14"></path>
-                            <path d="m12 5 7 7-7 7"></path>
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
                         </svg>
                     </button>
-
-                    <div class="security-note">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                        Continuous proctoring & event telemetry active
-                    </div>
                 </div>
             </div>
 
         </section>
 
     </main>
+
+    <!-- Submission Modal Backdrop -->
+    <div id="exam-modal-backdrop" class="exam-modal-backdrop">
+        <div class="exam-modal">
+            <div class="modal-icon-circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+            <h2 style="color: white; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem;">Exam Completed</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem;" id="modal-submessage">Your responses and proctoring telemetry have been verified and recorded.</p>
+            
+            <div class="modal-score-box">
+                <div class="score-metric">
+                    <span class="value" id="modal-score">0 / 10</span>
+                    <span class="label">Final Score</span>
+                </div>
+                <div class="score-metric">
+                    <span class="value" id="modal-percentage">0%</span>
+                    <span class="label">Accuracy</span>
+                </div>
+            </div>
+
+            <a href="/dashboard" style="display: inline-block; width: 100%; text-decoration: none;">
+                <button type="button" style="width: 100%;">
+                    <span>Return to Dashboard</span>
+                </button>
+            </a>
+        </div>
+    </div>
 
     <!-- Toast Notification Element -->
     <div id="exam-toast" class="exam-toast">
@@ -258,6 +294,8 @@ print(x + 5)</code></pre>
     </div>
 
 
+    <!-- Embedded JSON Data for Questions -->
+    <script id="exam-questions-data" type="application/json">{{ questions | tojson | safe }}</script>
 
 <script>
 
@@ -714,6 +752,8 @@ window.addEventListener(
 
         );
 
+        initQuestionEngine();
+
     }
 
 );
@@ -1018,52 +1058,158 @@ document.addEventListener(
 
 /* =====================================================
    PART 17
-   ANSWER SELECTED
+   QUESTION ENGINE (10 QUESTIONS)
 ===================================================== */
+const examQuestionsDataEl = document.getElementById("exam-questions-data");
+const examQuestions = examQuestionsDataEl ? JSON.parse(examQuestionsDataEl.textContent || "[]") : [];
+let currentQuestionIndex = 0;
+const candidateAnswers = {};
 
-const answerOptions =
+function initQuestionEngine() {
+    renderPalette();
+    renderCurrentQuestion();
+}
 
-    document.querySelectorAll(
+function renderPalette() {
+    const paletteGrid = document.getElementById("palette-grid");
+    if (!paletteGrid) return;
+    paletteGrid.innerHTML = "";
 
-        'input[name="answer"]'
+    examQuestions.forEach((q, idx) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "palette-btn";
+        btn.innerText = (idx + 1).toString().padStart(2, "0");
 
-    );
+        if (idx === currentQuestionIndex) {
+            btn.classList.add("current");
+        }
+        if (candidateAnswers[q.id]) {
+            btn.classList.add("answered");
+        }
 
+        btn.onclick = () => goToQuestion(idx);
+        paletteGrid.appendChild(btn);
+    });
 
-answerOptions.forEach(
+    const answeredCount = Object.keys(candidateAnswers).length;
+    const counter = document.getElementById("palette-counter");
+    if (counter) {
+        counter.innerText = `Answered: ${answeredCount} / ${examQuestions.length}`;
+    }
+}
 
-    function(option) {
+function renderCurrentQuestion() {
+    if (!examQuestions || examQuestions.length === 0) return;
+    const q = examQuestions[currentQuestionIndex];
 
+    const idxPill = document.getElementById("question-index-pill");
+    const domainPill = document.getElementById("question-domain-pill");
+    const pointsEl = document.getElementById("question-points");
+    const titleEl = document.getElementById("question-title");
+    const codeContainer = document.getElementById("code-container");
+    const codeEl = document.getElementById("question-code");
+    const optionsGroup = document.getElementById("options-group");
 
-        option.addEventListener(
+    if (idxPill) idxPill.innerText = `Question ${(currentQuestionIndex + 1).toString().padStart(2, "0")} of ${examQuestions.length.toString().padStart(2, "0")}`;
+    if (domainPill) domainPill.innerText = q.domain || "Python Core & Syntax";
+    if (pointsEl) pointsEl.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"></circle><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline></svg> ${q.points || '1.0 Mark'}`;
+    if (titleEl) titleEl.innerText = q.title;
 
-            "change",
-
-            function() {
-
-
-                logBrowserEvent(
-
-                    "answer_selected",
-
-                    "Candidate selected an answer"
-
-                );
-
-            }
-
-        );
-
+    if (q.code && q.code.trim()) {
+        codeContainer.style.display = "block";
+        codeEl.innerText = q.code;
+    } else {
+        codeContainer.style.display = "none";
     }
 
-);
+    // Render options
+    optionsGroup.innerHTML = "";
+    q.options.forEach(opt => {
+        const label = document.createElement("label");
+        label.className = "option";
 
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "answer";
+        input.value = opt.key;
+        if (candidateAnswers[q.id] === opt.key) {
+            input.checked = true;
+        }
 
+        input.onchange = function() {
+            candidateAnswers[q.id] = opt.key;
+            logBrowserEvent("answer_selected", `Candidate selected option ${opt.key} for Question ${q.id}`);
+            renderPalette();
+            // Automatically sync answer to server
+            saveAnswerToServer(q.id, opt.key);
+        };
 
-/* =====================================================
-   PART 18
-   SAVE ANSWER
-===================================================== */
+        const spanText = document.createElement("span");
+        spanText.className = "option-text";
+        spanText.innerHTML = `<span>${escapeHtml(opt.val)}</span><span class="option-key">${opt.key}</span>`;
+
+        label.appendChild(input);
+        label.appendChild(spanText);
+        optionsGroup.appendChild(label);
+    });
+
+    // Update Nav buttons
+    const btnPrev = document.getElementById("btn-prev");
+    const btnNext = document.getElementById("btn-next");
+    if (btnPrev) btnPrev.disabled = (currentQuestionIndex === 0);
+    if (btnNext) btnNext.disabled = (currentQuestionIndex === examQuestions.length - 1);
+
+    renderPalette();
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.innerText = text;
+    return div.innerHTML;
+}
+
+function goToQuestion(index) {
+    if (index >= 0 && index < examQuestions.length) {
+        currentQuestionIndex = index;
+        renderCurrentQuestion();
+    }
+}
+
+function prevQuestion() {
+    if (currentQuestionIndex > 0) {
+        goToQuestion(currentQuestionIndex - 1);
+    }
+}
+
+function nextQuestion() {
+    if (currentQuestionIndex < examQuestions.length - 1) {
+        goToQuestion(currentQuestionIndex + 1);
+    }
+}
+
+function saveAnswerToServer(questionId, selectedOption) {
+    fetch("/save-answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question_id: questionId, selected_option: selectedOption })
+    }).catch(err => console.error("Save answer error:", err));
+}
+
+function saveCurrentAnswer(showNotification = true) {
+    const q = examQuestions[currentQuestionIndex];
+    const selected = candidateAnswers[q.id];
+    if (!selected) {
+        showToast("Please select an option before saving");
+        return;
+    }
+    saveAnswerToServer(q.id, selected);
+    logBrowserEvent("answer_saved", `Candidate saved answer for Question ${q.id}: ${selected}`);
+    if (showNotification) {
+        showToast(`Answer for Question ${currentQuestionIndex + 1} saved!`);
+    }
+    renderPalette();
+}
 
 function showToast(msg) {
     const toast = document.getElementById("exam-toast");
@@ -1077,23 +1223,39 @@ function showToast(msg) {
     }
 }
 
-function submitAnswer() {
+function submitExam() {
+    const answeredCount = Object.keys(candidateAnswers).length;
+    const totalCount = examQuestions.length;
 
+    if (answeredCount < totalCount) {
+        const proceed = confirm(`You have answered ${answeredCount} of ${totalCount} questions. Are you sure you want to finish and submit?`);
+        if (!proceed) return;
+    } else {
+        const proceed = confirm("Are you ready to finalize and submit your examination?");
+        if (!proceed) return;
+    }
 
-    logBrowserEvent(
-
-        "answer_saved",
-
-        "Candidate saved answer"
-
-    );
-
-    showToast("Answer saved successfully");
-
-    alert(
-        "Answer saved successfully"
-    );
-
+    fetch("/submit-exam", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers: candidateAnswers })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            logBrowserEvent("exam_submitted", `Candidate submitted examination. Score: ${data.score}/${data.total}`);
+            document.getElementById("modal-score").innerText = `${data.score} / ${data.total}`;
+            document.getElementById("modal-percentage").innerText = `${data.percentage}%`;
+            document.getElementById("exam-modal-backdrop").classList.add("active");
+            showToast("Examination submitted successfully!");
+        } else {
+            alert(data.message || "Could not submit exam");
+        }
+    })
+    .catch(err => {
+        console.error("Exam submission error:", err);
+        alert("Submission failed. Please check your connection.");
+    });
 }
 
 

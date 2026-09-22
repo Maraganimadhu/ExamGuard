@@ -4,20 +4,667 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExamGuard Dashboard</title>
+    <meta name="description" content="ExamGuard - Candidate Command Center & Proctored Examination Dashboard">
+    <title>Candidate Dashboard | ExamGuard</title>
+
+    <!-- Link to Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
 </head>
 
 <body>
 
-    <h1>Candidate Dashboard</h1>
+    <!-- Ambient Glowing Cyber Backgrounds -->
+    <div class="background-blobs">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+    <div class="cyber-grid"></div>
 
-    <p>Welcome to ExamGuard{% if candidate_name %}, <strong>{{ candidate_name }}</strong>{% endif %}!</p>
+    <!-- Top Navigation Bar -->
+    <nav class="navbar">
+        <a href="/dashboard" class="nav-brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="navBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#4f46e5" />
+                            <stop offset="50%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#06b6d4" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="url(#navBrandGrad)" />
+                    <path d="m9 12 2 2 4-4" stroke="url(#navBrandGrad)" />
+                </svg>
+            </div>
+            <div class="brand-titles">
+                <div class="brand-logo-text">Exam<span>Guard</span></div>
+                <div class="brand-portal-label">Candidate Portal</div>
+            </div>
+        </a>
 
-    <div style="margin-top: 20px;">
-        <a href="/start-exam" style="display: inline-block; padding: 10px 20px; background: #4f46e5; color: white; text-decoration: none; border-radius: 6px; font-weight: 600;">Start Examination</a>
-        <a href="/logout" style="margin-left: 15px; color: #64748b;">Logout</a>
+        <div class="nav-actions">
+            <div class="system-status-pill">
+                <span class="pulse-dot"></span>
+                <span>AI Proctor Core Online</span>
+            </div>
+
+            <div class="candidate-profile-chip">
+                <div class="user-meta">
+                    <span class="user-name">{{ candidate_name if candidate_name else 'Candidate' }}</span>
+                    <span class="user-role">Verified Examinee</span>
+                </div>
+                <div class="user-avatar">
+                    {% if candidate_photo %}
+                        <img src="/{{ candidate_photo.replace('\\', '/') }}" alt="{{ candidate_name }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <span style="display: none;">{{ (candidate_name[0] if candidate_name else 'C') | upper }}</span>
+                    {% else %}
+                        <span>{{ (candidate_name[0] if candidate_name else 'C') | upper }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <a href="/logout" class="btn-logout" title="Sign Out of ExamGuard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span>Logout</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Dashboard Container -->
+    <main class="dashboard-container">
+
+        <!-- Hero Welcome Banner -->
+        <section class="hero-banner">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                    Proctored Environment Active
+                </div>
+                <h1 class="hero-title">Welcome back, <span class="highlight-name">{{ candidate_name if candidate_name else 'Candidate' }}</span></h1>
+                <p class="hero-subtitle">Your standardized examination workstation is primed and verified. Review your hardware diagnostics, review proctoring rules, and launch your session when ready.</p>
+
+                <div class="hero-meta-strip">
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect width="20" height="16" x="2" y="4" rx="2"></rect>
+                            <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                        </svg>
+                        <span>Account: <strong>{{ candidate_email if candidate_email else 'Candidate Account' }}</strong></span>
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="9" cy="7" r="4"></circle>
+                            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                        </svg>
+                        <span>Candidate ID: <strong>#EG-{{ candidate.id if candidate and candidate.id else '1024' }}</strong></span>
+                    </div>
+                    <div class="meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 14 14"></polyline>
+                        </svg>
+                        <span>Local Time: <strong id="liveClock">--:--:--</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-visual-badge">
+                <div class="hero-visual-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    <span class="hero-visual-label">Secure Core</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Telemetry & Stats Grid -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon icon-blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Questions</span>
+                    <span class="stat-value">{{ total_questions if total_questions else 10 }}</span>
+                    <span class="stat-desc">Multiple-choice format</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-cyan">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Time Allowed</span>
+                    <span class="stat-value">{{ exam_duration_mins if exam_duration_mins else 30 }} <small style="font-size: 0.9rem; font-weight: 500;">min</small></span>
+                    <span class="stat-desc">Automatic timer submit</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-purple">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                        <path d="M4 22h16"></path>
+                        <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                        <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                        <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Points</span>
+                    <span class="stat-value">10.0</span>
+                    <span class="stat-desc">1 Mark per question</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon icon-green">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 12h5"></path>
+                        <path d="M17 12h5"></path>
+                        <path d="M9 12a3 3 0 1 0 6 0 3 3 0 1 0-6 0Z"></path>
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">AI Proctoring</span>
+                    <span class="stat-value" style="color: var(--success); font-size: 1.25rem;">Active</span>
+                    <span class="stat-desc">Continuous telemetry</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Dashboard Split Layout -->
+        <div class="dashboard-grid">
+
+            <!-- Left Primary Column: Exam Portal & Diagnostics -->
+            <div class="main-column">
+
+                <!-- Active Assessment Card -->
+                <div class="dashboard-card exam-featured-card">
+                    <div class="card-header-row">
+                        <div class="card-title-group">
+                            <div class="card-title-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="4 17 10 11 4 5"></polyline>
+                                    <line x1="12" y1="19" x2="20" y2="19"></line>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="card-title">Assigned Examination</h2>
+                            </div>
+                        </div>
+                        <span class="card-badge badge-live">Ready To Launch</span>
+                    </div>
+
+                    <div class="exam-main-details">
+                        <div>
+                            <span class="exam-code-badge">EXAM-PY2026-CORE</span>
+                            <h3 class="exam-topic-title">Python Core & Algorithmic Logic Assessment</h3>
+                            <p class="exam-summary-text">
+                                High-integrity technical assessment testing Python syntax, data structures, list slicing, functions, variable scopes, and logic manipulation under real-time AI computer vision proctoring.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Exam Tags -->
+                    <div class="exam-tags">
+                        <div class="tag-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 14 14"></polyline>
+                            </svg>
+                            <span>30 Minutes Duration</span>
+                        </div>
+                        <div class="tag-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                            <span>Webcam Proctor Enforced</span>
+                        </div>
+                        <div class="tag-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                                <path d="m9 12 2 2 4-4"></path>
+                            </svg>
+                            <span>10 Multiple Choice Questions</span>
+                        </div>
+                        <div class="tag-item">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                                <path d="M3 9h18"></path>
+                            </svg>
+                            <span>Instant Automated Grading</span>
+                        </div>
+                    </div>
+
+                    <!-- Hardware Readiness Diagnostics Box -->
+                    <div class="hardware-check-box">
+                        <div class="hardware-title">
+                            <span>Pre-Exam System Diagnostics</span>
+                            <span style="font-size: 0.72rem; color: var(--success); text-transform: none; font-weight: 600;">● All Systems Ready</span>
+                        </div>
+
+                        <div class="hardware-items-grid">
+                            <div class="hardware-item">
+                                <div class="hardware-left">
+                                    <div class="hardware-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                            <circle cx="12" cy="13" r="4"></circle>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="hardware-name">Camera Feed</div>
+                                        <div class="hardware-state state-ok" id="camStatusLabel">Ready</div>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-test-hardware" id="btnTestCamera">Test Cam</button>
+                            </div>
+
+                            <div class="hardware-item">
+                                <div class="hardware-left">
+                                    <div class="hardware-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="hardware-name">Audio Monitor</div>
+                                        <div class="hardware-state state-ok">Listening</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.72rem; color: var(--text-muted);">Calibrated</span>
+                            </div>
+
+                            <div class="hardware-item">
+                                <div class="hardware-left">
+                                    <div class="hardware-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <rect width="20" height="14" x="2" y="3" rx="2"></rect>
+                                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="hardware-name">Full-Screen Mode</div>
+                                        <div class="hardware-state state-ok">Supported</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.72rem; color: var(--text-muted);">Enforced</span>
+                            </div>
+
+                            <div class="hardware-item">
+                                <div class="hardware-left">
+                                    <div class="hardware-icon">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                                            <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                                            <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                                            <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <div class="hardware-name">Network Latency</div>
+                                        <div class="hardware-state state-ok" id="netLatencyText">28 ms</div>
+                                    </div>
+                                </div>
+                                <span style="font-size: 0.72rem; color: var(--success);">Optimal</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Exam Launch Button CTA -->
+                    <div class="exam-cta-wrapper">
+                        <a href="/start-exam" class="btn-start-exam" id="btnStartExam">
+                            <span>Enter Secure Exam Room</span>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                <polyline points="12 5 19 12 12 19"></polyline>
+                            </svg>
+                        </a>
+                        <div class="cta-helper-text">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            <span>Clicking Start initiates fullscreen proctoring, webcam telemetry, and starts the 30-minute exam timer.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity / Session History Card -->
+                <div class="dashboard-card history-card">
+                    <div class="card-header-row">
+                        <div class="card-title-group">
+                            <div class="card-title-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                            </div>
+                            <h2 class="card-title">Exam Activity & History</h2>
+                        </div>
+                        <span class="card-badge badge-verified">Session Logs</span>
+                    </div>
+
+                    {% if recent_attempts and recent_attempts | length > 0 %}
+                        <div class="history-list">
+                            {% for att in recent_attempts %}
+                            <div class="history-item">
+                                <div class="history-title-group">
+                                    <span class="history-session-id">Session: {{ att.session_id[:16] }}...</span>
+                                    <span class="history-date">Submitted: {{ att.last_time }}</span>
+                                </div>
+                                <div class="history-score-badge">
+                                    {{ att.correct_count if att.correct_count is not none else 0 }} / {{ att.answered_count }} Marks
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="empty-history-box">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <path d="M9 15h6"></path>
+                            </svg>
+                            <div class="empty-history-text">No previous exam sessions recorded.</div>
+                            <div class="empty-history-sub">Your verified results and proctoring analytics will appear here after your first submission.</div>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <!-- Right Secondary Column: Candidate ID & Security Guidelines -->
+            <aside class="sidebar-column">
+
+                <!-- Candidate Identity Card -->
+                <div class="dashboard-card candidate-id-card">
+                    <div class="id-card-glow"></div>
+
+                    <div class="id-photo-wrapper">
+                        {% if candidate_photo %}
+                            <img src="/{{ candidate_photo.replace('\\', '/') }}" alt="{{ candidate_name }}" class="id-photo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="id-avatar-fallback" style="display: none;">{{ (candidate_name[0] if candidate_name else 'C') | upper }}</div>
+                        {% else %}
+                            <div class="id-avatar-fallback">{{ (candidate_name[0] if candidate_name else 'C') | upper }}</div>
+                        {% endif %}
+                        <div class="id-verified-tick" title="Identity Verified by ExamGuard">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <h3 class="candidate-name-lg">{{ candidate_name if candidate_name else 'Candidate' }}</h3>
+                    <p class="candidate-email-text">{{ candidate_email if candidate_email else 'Candidate Account' }}</p>
+
+                    <div class="candidate-details-list">
+                        <div class="detail-row">
+                            <span class="detail-label">Candidate Code</span>
+                            <span class="detail-value mono">#EG-{{ candidate.id if candidate and candidate.id else '1024' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Biometric Verification</span>
+                            <span class="detail-value" style="color: var(--success);">Face Enrolled</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Enrolled Since</span>
+                            <span class="detail-value">{{ candidate_joined if candidate_joined else 'Current Batch' }}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Security Clearance</span>
+                            <span class="detail-value" style="color: #38bdf8;">Authorized</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proctoring Security Rules Card -->
+                <div class="dashboard-card rules-card">
+                    <div class="card-header-row">
+                        <div class="card-title-group">
+                            <div class="card-title-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                            </div>
+                            <h2 class="card-title">Proctoring Rules</h2>
+                        </div>
+                        <span class="card-badge" style="background: var(--warning-bg); border: 1px solid var(--warning-border); color: var(--warning);">Strict</span>
+                    </div>
+
+                    <div class="rules-list">
+                        <div class="rule-item">
+                            <div class="rule-icon camera">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                    <circle cx="12" cy="13" r="4"></circle>
+                                </svg>
+                            </div>
+                            <div class="rule-text">
+                                <span class="rule-title">Stay in Camera Frame</span>
+                                <span class="rule-desc">Your face must remain clearly visible, centered, and well-illuminated at all times.</span>
+                            </div>
+                        </div>
+
+                        <div class="rule-item">
+                            <div class="rule-icon browser">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect width="18" height="18" x="3" y="3" rx="2"></rect>
+                                    <path d="M3 9h18"></path>
+                                    <path d="M9 21V9"></path>
+                                </svg>
+                            </div>
+                            <div class="rule-text">
+                                <span class="rule-title">No Tab Switching</span>
+                                <span class="rule-desc">Leaving the exam tab, switching applications, or pressing Alt+Tab immediately triggers a security strike.</span>
+                            </div>
+                        </div>
+
+                        <div class="rule-item">
+                            <div class="rule-icon shield">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <line x1="18" y1="8" x2="23" y2="13"></line>
+                                    <line x1="23" y1="8" x2="18" y2="13"></line>
+                                </svg>
+                            </div>
+                            <div class="rule-text">
+                                <span class="rule-title">No Multiple Persons</span>
+                                <span class="rule-desc">The AI neural detector flags any secondary person detected in your background.</span>
+                            </div>
+                        </div>
+
+                        <div class="rule-item">
+                            <div class="rule-icon audio">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                </svg>
+                            </div>
+                            <div class="rule-text">
+                                <span class="rule-title">Audio & Silence Enforced</span>
+                                <span class="rule-desc">Microphone monitors environmental audio. No speaking or unauthorized background voices.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Pre-Flight Checklist -->
+                    <div style="margin-top: 1.25rem;">
+                        <span style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); font-weight: 700;">Pre-Flight Readiness Check</span>
+                        <div class="checklist-box">
+                            <label class="checklist-label">
+                                <input type="checkbox" checked>
+                                <span>I am sitting in a well-lit, private room.</span>
+                            </label>
+                            <label class="checklist-label">
+                                <input type="checkbox" checked>
+                                <span>My camera and microphone are operational.</span>
+                            </label>
+                            <label class="checklist-label">
+                                <input type="checkbox" checked>
+                                <span>All other windows and apps are closed.</span>
+                            </label>
+                            <label class="checklist-label">
+                                <input type="checkbox" checked>
+                                <span>I understand the 30-minute proctoring rules.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </aside>
+        </div>
+
+    </main>
+
+    <!-- Camera Diagnostics Test Modal -->
+    <div class="modal-backdrop" id="cameraModal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">Live Camera Diagnostics</h3>
+                <button type="button" class="btn-modal-close" id="btnCloseModal">✕</button>
+            </div>
+
+            <div class="video-preview-wrapper">
+                <video id="testVideo" autoplay playsinline muted></video>
+                <div class="face-target-reticle"></div>
+                <div class="video-status-overlay">
+                    <span class="pulse-dot"></span>
+                    <span id="camDiagnosticMsg">Webcam stream live</span>
+                </div>
+            </div>
+
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.45;">
+                Position your face inside the targeting circle. Ensure adequate lighting and an unobstructed frontal view for optimal facial monitoring accuracy.
+            </p>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-modal-done" id="btnConfirmCamera">Camera Looks Good</button>
+            </div>
+        </div>
     </div>
 
+    <!-- Executive Footer -->
+    <footer class="footer">
+        <div class="footer-inner">
+            <div>
+                © 2026 <strong>ExamGuard Proctored Systems</strong>. All rights reserved.
+            </div>
+            <div class="footer-links">
+                <span style="color: var(--success); display: flex; align-items: center; gap: 0.35rem;">
+                    <span class="pulse-dot"></span> All Systems Operational
+                </span>
+                <a href="#rules" class="footer-link">Proctoring Terms</a>
+                <a href="#help" class="footer-link">Support & FAQs</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Client Script -->
+    <script>
+        // Live clock updater
+        function updateClock() {
+            const clockEl = document.getElementById('liveClock');
+            if (clockEl) {
+                const now = new Date();
+                clockEl.textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            }
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Hardware test camera modal logic
+        const btnTestCamera = document.getElementById('btnTestCamera');
+        const cameraModal = document.getElementById('cameraModal');
+        const btnCloseModal = document.getElementById('btnCloseModal');
+        const btnConfirmCamera = document.getElementById('btnConfirmCamera');
+        const testVideo = document.getElementById('testVideo');
+        const camStatusLabel = document.getElementById('camStatusLabel');
+        const camDiagnosticMsg = document.getElementById('camDiagnosticMsg');
+        let stream = null;
+
+        async function openCamera() {
+            cameraModal.classList.add('active');
+            try {
+                camDiagnosticMsg.textContent = "Requesting camera access...";
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: "user" }
+                });
+                testVideo.srcObject = stream;
+                camDiagnosticMsg.textContent = "Webcam stream live & centered";
+                if (camStatusLabel) {
+                    camStatusLabel.textContent = "Verified OK";
+                }
+            } catch (err) {
+                console.error("Camera access error:", err);
+                camDiagnosticMsg.textContent = "Camera access denied or unavailable";
+                if (camStatusLabel) {
+                    camStatusLabel.textContent = "Check Cam";
+                    camStatusLabel.classList.remove('state-ok');
+                    camStatusLabel.style.color = "var(--danger)";
+                }
+            }
+        }
+
+        function closeCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            if (testVideo) {
+                testVideo.srcObject = null;
+            }
+            cameraModal.classList.remove('active');
+        }
+
+        if (btnTestCamera) {
+            btnTestCamera.addEventListener('click', openCamera);
+        }
+        if (btnCloseModal) {
+            btnCloseModal.addEventListener('click', closeCamera);
+        }
+        if (btnConfirmCamera) {
+            btnConfirmCamera.addEventListener('click', closeCamera);
+        }
+
+        // Close on backdrop click
+        cameraModal.addEventListener('click', (e) => {
+            if (e.target === cameraModal) {
+                closeCamera();
+            }
+        });
+    </script>
 </body>
 
 </html>

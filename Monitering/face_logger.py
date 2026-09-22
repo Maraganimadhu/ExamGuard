@@ -1,4 +1,9 @@
 from datetime import datetime
+import os
+import sys
+
+# Ensure project root is available in sys.path when imported or run
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from database import get_db
 
@@ -11,11 +16,8 @@ def log_face_state(
     session_id,
     current_state
 ):
-
     connection = get_db()
-
     now = datetime.now().isoformat()
-
 
     # ----------------------------------------
     # GET PREVIOUS OPEN EVENT
@@ -33,12 +35,10 @@ def log_face_state(
         session_id
     )).fetchone()
 
-
     # ----------------------------------------
     # FIRST FACE EVENT
     # ----------------------------------------
     if not previous:
-
         connection.execute("""
             INSERT INTO face_events
             (
@@ -55,21 +55,15 @@ def log_face_state(
             now
         ))
 
-
     else:
-
         # ----------------------------------------
         # SAME STATE
         # ----------------------------------------
         # If the face state has not changed,
         # there is no need to create another event.
-
         if previous["event_type"] == current_state:
-
             connection.close()
-
             return
-
 
         # ----------------------------------------
         # STATE CHANGED
@@ -77,31 +71,25 @@ def log_face_state(
         started_at = datetime.fromisoformat(
             previous["started_at"]
         )
-
         ended_at = datetime.fromisoformat(now)
-
         duration = (
             ended_at - started_at
         ).total_seconds()
-
 
         # ----------------------------------------
         # CLOSE PREVIOUS EVENT
         # ----------------------------------------
         connection.execute("""
             UPDATE face_events
-
             SET
                 ended_at = ?,
                 duration_seconds = ?
-
             WHERE id = ?
         """, (
             now,
             duration,
             previous["id"]
         ))
-
 
         # ----------------------------------------
         # START NEW EVENT
@@ -122,10 +110,8 @@ def log_face_state(
             now
         ))
 
-
     # ----------------------------------------
     # SAVE CHANGES
     # ----------------------------------------
     connection.commit()
-
     connection.close()

@@ -154,21 +154,23 @@ def init_db():
         )
     """)
 
-    # result = connection.execute("SELECT * FROM face_events").fetchall()
+    # ----------------------------------------
+    # EXAM ANSWERS TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS exam_answers (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            question_id INTEGER NOT NULL,
+            selected_option TEXT,
+            is_correct INTEGER,
+            submitted_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id)
+                REFERENCES candidates(id)
+        )
+    """)
 
-    # print("Number of rows:", len(result))
-
-    # for row in result:
-    #     print(dict(row)) 
-
-
-    # # ----------------------------------------
-    # # SAVE DATABASE CHANGES
-    # # ----------------------------------------
-    # connection.commit()
-
-
-    # # ----------------------------------------
-    # # CLOSE DATABASE CONNECTION
-    # # ----------------------------------------
-    # connection.close()
+    # Save database changes
+    connection.commit()
+    connection.close()

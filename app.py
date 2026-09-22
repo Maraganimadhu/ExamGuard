@@ -1,11 +1,12 @@
-from face_logger import log_face_state
-from face_monitoring import detect_face
+from Monitering.face_logger import log_face_state
+from Monitering.face_monitoring import detect_face
 import os
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from database import init_db, get_db
 from cemara import capture_photo
+from questions import EXAM_QUESTIONS, QUESTION_KEY_MAP
 import uuid
 from datetime import datetime
 
@@ -84,7 +85,7 @@ def register():
 
         return render_template(REGISTER_TEMPLATE, success=True, username=username)
 
-    return redirect(login)
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -123,36 +124,75 @@ def dashboard():
     if 'candidate_id' not in session:
         return render_template(LOGIN_TEMPLATE, error="Please login first.")
        
-    return render_template("dashboard.html", success=True, candidate_name=session.get('candidate_name'))
+    candidate_id = session['candidate_id']
+    candidate = None
+    recent_attempts = []
 
+    try:
+        connection = get_db()
+        cursor = connection.cursor()
+        cursor.execute("SELECT id, name, email, photo, created_at FROM candidates WHERE id = ?", (candidate_id,))
+        cand_row = cursor.fetchone()
+        if cand_row:
+            candidate = dict(cand_row)
+
+        cursor.execute("""
+            SELECT session_id, COUNT(*) as answered_count, SUM(is_correct) as correct_count, MAX(submitted_at) as last_time
+            FROM exam_answers
+            WHERE candidate_id = ?
+            GROUP BY session_id
+            ORDER BY last_time DESC
+            LIMIT 5
+        """, (candidate_id,))
+        rows = cursor.fetchall()
+        for r in rows:
+            recent_attempts.append(dict(r))
+
+        connection.close()
+    except Exception as e:
+        print(f"Error fetching dashboard candidate data: {e}")
+
+    candidate_name = candidate['name'] if candidate and candidate.get('name') else session.get('candidate_name', 'Candidate')
+    candidate_email = candidate['email'] if candidate and candidate.get('email') else ''
+    candidate_photo = candidate['photo'] if candidate and candidate.get('photo') else ''
+    candidate_joined = candidate['created_at'] if candidate and candidate.get('created_at') else None
+
+    return render_template(
+        "dashboard.html",
+        success=True,
+        candidate=candidate,
+        candidate_name=candidate_name,
+        candidate_email=candidate_email,
+        candidate_photo=candidate_photo,
+        candidate_joined=candidate_joined,
+        total_questions=len(EXAM_QUESTIONS),
+        exam_duration_mins=30,
+        recent_attempts=recent_attempts
+    )
+
+
+
+
+# ----------------------------------------
+# EXAMINATION ROUTES
+# ----------------------------------------
 
 
 
 @app.route("/start-exam")
 def start_exam():
-
     # ----------------------------------------
     # CHECK LOGIN
     # ----------------------------------------
     if "candidate_id" not in session:
-
-        return {
-            "success": False,
-            "message": "Candidate is not logged in"
-        }, 401
-
+        return redirect(url_for('login'))
 
     # ----------------------------------------
     # CREATE UNIQUE EXAM SESSION
     # ----------------------------------------
-    exam_session_id = str(
-        uuid.uuid4()
-    )
-
-
-    # Store exam session ID
+    exam_session_id = str(uuid.uuid4())
     session["exam_session_id"] = exam_session_id
-
+    session["exam_answers"] = {}
 
     # ----------------------------------------
     # OPEN EXAM PAGE
@@ -160,8 +200,100 @@ def start_exam():
     return render_template(
         "exam.html",
         candidate_name=session.get("candidate_name", "Candidate"),
-        exam_session_id=exam_session_id
+        exam_session_id=exam_session_id,
+        questions=EXAM_QUESTIONS,
+        total_questions=len(EXAM_QUESTIONS)
     )
+
+
+@app.route("/save-answer", methods=["POST"])
+def save_answer():
+    if "candidate_id" not in session:
+        return {"success": False, "message": "Candidate is not logged in"}, 401
+    exam_session_id = session.get("exam_session_id")
+    if not exam_session_id:
+        return {"success": False, "message": "Exam not started"}, 400
+
+    data = request.get_json() or {}
+    question_id = data.get("question_id")
+    selected_option = data.get("selected_option")
+
+    if question_id is None or selected_option is None:
+        return {"success": False, "message": "Missing question_id or selected_option"}, 400
+
+    answers = session.get("exam_answers", {})
+    answers[str(question_id)] = selected_option
+    session["exam_answers"] = answers
+
+    # Save to database
+    try:
+        connection = get_db()
+        is_corr = 1 if selected_option == QUESTION_KEY_MAP.get(int(question_id)) else 0
+        connection.execute("""
+            INSERT INTO exam_answers (candidate_id, session_id, question_id, selected_option, is_correct, submitted_at)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            session["candidate_id"],
+            exam_session_id,
+            int(question_id),
+            selected_option,
+            is_corr,
+            datetime.now().isoformat()
+        ))
+        connection.commit()
+        connection.close()
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "message": f"Question {question_id} answer saved",
+        "question_id": question_id,
+        "selected_option": selected_option
+    }, 200
+
+
+@app.route("/submit-exam", methods=["POST"])
+def submit_exam():
+    if "candidate_id" not in session:
+        return {"success": False, "message": "Candidate is not logged in"}, 401
+    exam_session_id = session.get("exam_session_id")
+    if not exam_session_id:
+        return {"success": False, "message": "Exam not started"}, 400
+
+    data = request.get_json() or {}
+    answers = data.get("answers") or session.get("exam_answers", {})
+
+    score = 0
+    for q in EXAM_QUESTIONS:
+        qid_str = str(q["id"])
+        if answers.get(qid_str) == q["correct"]:
+            score += 1
+
+    try:
+        connection = get_db()
+        connection.execute("""
+            INSERT INTO browser_events (candidate_id, session_id, event_type, event_time, details)
+            VALUES (?, ?, ?, ?, ?)
+        """, (
+            session["candidate_id"],
+            exam_session_id,
+            "exam_completed",
+            datetime.now().isoformat(),
+            f"Exam submitted. Score: {score}/{len(EXAM_QUESTIONS)}"
+        ))
+        connection.commit()
+        connection.close()
+    except Exception:
+        pass
+
+    return {
+        "success": True,
+        "message": "Examination submitted successfully",
+        "score": score,
+        "total": len(EXAM_QUESTIONS),
+        "percentage": round((score / len(EXAM_QUESTIONS)) * 100, 1)
+    }, 200
 
 
 # ----------------------------------------
