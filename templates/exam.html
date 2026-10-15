@@ -639,29 +639,41 @@ function logBrowserEvent(
 
 
     .then(function(data) {
-
-        console.log(
-
-            "Browser event saved:",
-
-            eventType
-
-        );
-
+        console.log("Browser event saved:", eventType);
+        if (data && data.screenshot_required) {
+            captureAndUploadEvidence();
+        }
     })
-
-
     .catch(function(error) {
-
-        console.error(
-
-            "Browser event error:",
-
-            error
-
-        );
-
+        console.error("Browser event error:", error);
     });
+
+function captureAndUploadEvidence() {
+    try {
+        if (!video) return;
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = video.videoWidth || 640;
+        tempCanvas.height = video.videoHeight || 480;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+        const dataUrl = tempCanvas.toDataURL("image/jpeg", 0.85);
+
+        fetch("/upload-evidence", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: dataUrl })
+        })
+        .then(res => res.json())
+        .then(result => {
+            console.log("Suspicious event evidence saved:", result);
+        })
+        .catch(err => {
+            console.error("Evidence upload error:", err);
+        });
+    } catch (e) {
+        console.error("Failed to capture evidence screenshot:", e);
+    }
+}
 
 
     /*

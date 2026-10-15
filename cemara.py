@@ -56,6 +56,11 @@ def capture_photo(image_data):
     photo_path=os.path.join("static/uploads",filename)
     cv2.imwrite(photo_path,img) #here we are adding capature file with existing filename
     return photo_path     #saved a photo in existing file
+
+
+# Alias for compatibility
+save_captured_photo = capture_photo
+
     
    
 

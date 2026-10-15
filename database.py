@@ -2,7 +2,8 @@ import sqlite3
 import os
 
 
-DATABASE = "database/examguard.db"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, "database", "examguard.db")
 
 
 # ----------------------------------------
@@ -30,7 +31,7 @@ def get_db():
 def init_db():
 
     # Create database folder if it does not exist
-    os.makedirs("database", exist_ok=True)
+    os.makedirs(os.path.join(BASE_DIR, "database"), exist_ok=True)
 
     connection = get_db()
 
@@ -168,6 +169,117 @@ def init_db():
             submitted_at TEXT NOT NULL,
             FOREIGN KEY (candidate_id)
                 REFERENCES candidates(id)
+        )
+    """)
+
+
+    # ----------------------------------------
+    # EXAM SESSIONS TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS exam_sessions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT,
+            started_at TEXT NOT NULL,
+            ended_at TEXT,
+            submitted_at TEXT,
+            status TEXT DEFAULT 'in_progress',
+            FOREIGN KEY (candidate_id)
+                REFERENCES candidates(id)
+        )
+    """)
+
+    session_columns = [
+        col["name"]
+        for col in connection.execute("PRAGMA table_info(exam_sessions)").fetchall()
+    ]
+    if "session_id" not in session_columns:
+        connection.execute("ALTER TABLE exam_sessions ADD COLUMN session_id TEXT")
+    if "submitted_at" not in session_columns:
+        connection.execute("ALTER TABLE exam_sessions ADD COLUMN submitted_at TEXT")
+
+
+    # ----------------------------------------
+    # INTEGRITY SCORES TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS integrity_scores (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            session_id TEXT UNIQUE NOT NULL,
+            candidate_id INTEGER NOT NULL,
+            event_penalty REAL NOT NULL,
+            face_presence_ratio REAL NOT NULL,
+            integrity_score REAL NOT NULL,
+            risk_level TEXT NOT NULL,
+            computed_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id)
+        )
+    """)
+
+    # ----------------------------------------
+    # INCIDENT LOGS TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS incident_logs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            event_type TEXT NOT NULL,
+            description TEXT NOT NULL,
+            severity TEXT NOT NULL,
+            event_time TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id)
+        )
+    """)
+
+    # ----------------------------------------
+    # ALERTS TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS alerts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            alert_type TEXT NOT NULL,
+            message TEXT,
+            severity TEXT NOT NULL,
+            status TEXT DEFAULT 'open',
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id)
+        )
+    """)
+
+    # ----------------------------------------
+    # EVIDENCE TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS evidence (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            evidence_type TEXT NOT NULL,
+            filename TEXT,
+            mime_type TEXT,
+            file_data BLOB,
+            sha256_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id)
+        )
+    """)
+
+    # ----------------------------------------
+    # AI REPORTS TABLE
+    # ----------------------------------------
+    connection.execute("""
+        CREATE TABLE IF NOT EXISTS ai_reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            candidate_id INTEGER NOT NULL,
+            session_id TEXT NOT NULL,
+            report TEXT NOT NULL,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (candidate_id) REFERENCES candidates(id)
         )
     """)
 
